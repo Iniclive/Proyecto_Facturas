@@ -1,0 +1,45 @@
+﻿<#@ include file ="EntityLite.ttinclude\EntityLite.ttinclude" #>
+<#
+	var generation = new DataLayerGeneration
+	{
+		// 1. El proveedor para SQL Server
+		ProviderName = "System.Data.SqlClient",
+
+		// 2. LA CADENA DE DISEÑO: Usa la de tu captura de pantalla
+		// Nota: Usamos @ y doble barra para el localdb
+		ConnectionString = @"Data Source=(localdb)\InigoPracticaDB;Initial Catalog=PracticaFacturacionDB;Integrated Security=True",
+
+		// 3. NOMBRE DE LA CONEXIÓN: Es el que buscará en el appsettings.json de tu API
+		ConnectionStringName= "FacturacionConnection",
+
+		// 4. NOMBRE DEL SERVICIO: El que usarás para inyectar en los controladores
+		DataServiceName = "FacturacionDataService",
+
+		DefaultSchema = "dbo",
+
+		// 5. NAMESPACE: Debe coincidir con el nombre de tu proyecto de "Biblioteca de Clases"
+		RootNamespace = "Proyecto_Facturas.Data", 
+
+		GenerateAsyncMethods = true,
+		AnnotateNullableReferenceTypes = true,
+		AuditDateTimeKind = DateTimeKind.Utc,
+		JsonType = JsonType.JsonNode,
+
+		// 6. ENTIDADES: Aquí mapeas tus tablas de la imagen
+		EntitySettings = new List<EntitySetting>
+		{
+			new EntitySetting { EntityName = "Factura", BaseTableName = "Facturas" },
+			new EntitySetting { EntityName = "Insurance", BaseTableName = "Insurances" },
+			new EntitySetting { EntityName = "LineaFactura", BaseTableName = "Lineas_Factura" },
+			new EntitySetting { EntityName = "User", BaseTableName = "Users" },
+			new EntitySetting { EntityName = "Material", BaseTableName = "Materials" },
+			new EntitySetting { EntityName = "Master_data", BaseTableName = "Master_data" }
+			// Agrega Materials y Master_data de la misma forma
+		},
+		ProcedureSettings = new List<ProcedureSetting> { },
+		EnumSettings = new List<EnumSetting> { }
+	};
+
+	// 7. ¡IMPORTANTE! Descomenta esta línea para que se generen los archivos
+	Render(generation);
+#>
