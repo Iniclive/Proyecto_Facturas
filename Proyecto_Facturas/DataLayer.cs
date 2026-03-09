@@ -176,6 +176,42 @@ namespace Proyecto_Facturas.Data
 			}
         }
 
+		private String? _name;
+		[DataMember]
+		[SqlField(DbType.String, 50, ColumnName ="name" )]		
+		public String? Name 
+		{ 
+		    get { return _name; } 
+			set 
+			{
+			    _name = value;
+			}
+        }
+
+		private String? _expr1;
+		[DataMember]
+		[SqlField(DbType.String, 50, ColumnName ="Expr1" )]		
+		public String? Expr1 
+		{ 
+		    get { return _expr1; } 
+			set 
+			{
+			    _expr1 = value;
+			}
+        }
+
+		private String? _nombreEstado;
+		[DataMember]
+		[SqlField(DbType.String, 50, ColumnName ="nombre_estado" )]		
+		public String? NombreEstado 
+		{ 
+		    get { return _nombreEstado; } 
+			set 
+			{
+			    _nombreEstado = value;
+			}
+        }
+
 
 	}
 
@@ -281,11 +317,16 @@ namespace Proyecto_Facturas.Data
 		public const string CreadoPor = "CreadoPor";
 		public const string Modificado = "Modificado";
 		public const string ModificadoPor = "ModificadoPor";
+		public const string Name = "Name";
+		public const string Expr1 = "Expr1";
+		public const string NombreEstado = "NombreEstado";
 	}
 
 	public static partial class FacturaProjections
 	{
 		public const string BaseTable = "BaseTable";
+		public const string Basic = "Basic";
+		public const string Prueba = "Prueba";
 	}
 	[Serializable]
 	[DataContract]
@@ -665,6 +706,30 @@ namespace Proyecto_Facturas.Data
 			}
         }
 
+		private String? _email;
+		[DataMember]
+		[SqlField(DbType.String, 50, ColumnName ="email", BaseColumnName ="email", BaseTableName = "Users" )]		
+		public String? Email 
+		{ 
+		    get { return _email; } 
+			set 
+			{
+			    _email = value;
+			}
+        }
+
+		private String? _password;
+		[DataMember]
+		[SqlField(DbType.String, 50, ColumnName ="password", BaseColumnName ="password", BaseTableName = "Users" )]		
+		public String? Password 
+		{ 
+		    get { return _password; } 
+			set 
+			{
+			    _password = value;
+			}
+        }
+
 
 	}
 
@@ -759,6 +824,8 @@ namespace Proyecto_Facturas.Data
 	{
 		public const string IdUser = "IdUser";
 		public const string Name = "Name";
+		public const string Email = "Email";
+		public const string Password = "Password";
 	}
 
 	public static partial class UserProjections
