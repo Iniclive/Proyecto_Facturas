@@ -556,6 +556,30 @@ namespace Proyecto_Facturas.Data
 			}
         }
 
+		private Int32 _idFactura;
+		[DataMember]
+		[SqlField(DbType.Int32, 4, Precision = 10, ColumnName ="id_factura", BaseColumnName ="id_factura", BaseTableName = "Lineas_Factura" )]		
+		public Int32 IdFactura 
+		{ 
+		    get { return _idFactura; } 
+			set 
+			{
+			    _idFactura = value;
+			}
+        }
+
+		private String? _nombreMaterial;
+		[DataMember]
+		[SqlField(DbType.String, 50, ColumnName ="nombre_material" )]		
+		public String? NombreMaterial 
+		{ 
+		    get { return _nombreMaterial; } 
+			set 
+			{
+			    _nombreMaterial = value;
+			}
+        }
+
 
 	}
 
@@ -657,11 +681,14 @@ namespace Proyecto_Facturas.Data
 		public const string CreadoPor = "CreadoPor";
 		public const string Modificado = "Modificado";
 		public const string ModificadoPor = "ModificadoPor";
+		public const string IdFactura = "IdFactura";
+		public const string NombreMaterial = "NombreMaterial";
 	}
 
 	public static partial class LineaFacturaProjections
 	{
 		public const string BaseTable = "BaseTable";
+		public const string Basic = "Basic";
 	}
 	[Serializable]
 	[DataContract]
@@ -1184,6 +1211,114 @@ namespace Proyecto_Facturas.Data
 	{
 		public const string BaseTable = "BaseTable";
 	}
+	[Serializable]
+	[DataContract]
+	[SqlEntity(BaseTableName="LineaSimple")]
+	public partial class LineaSimple
+	{
+		private Int32 _idLineaFactura;
+		[DataMember]
+		[SqlField(DbType.Int32, 4, Precision = 10, IsKey=true, ColumnName ="id_linea_factura" )]		
+		public Int32 IdLineaFactura 
+		{ 
+		    get { return _idLineaFactura; } 
+			set 
+			{
+			    _idLineaFactura = value;
+			}
+        }
+
+		private Int32 _cantidad;
+		[DataMember]
+		[SqlField(DbType.Int32, 4, Precision = 10, ColumnName ="cantidad" )]		
+		public Int32 Cantidad 
+		{ 
+		    get { return _cantidad; } 
+			set 
+			{
+			    _cantidad = value;
+			}
+        }
+
+		private Decimal _importe;
+		[DataMember]
+		[SqlField(DbType.Decimal, 17, Precision = 19, Scale=2, ColumnName ="importe" )]		
+		public Decimal Importe 
+		{ 
+		    get { return _importe; } 
+			set 
+			{
+			    _importe = value;
+			}
+        }
+
+		private Decimal? _importeTotal;
+		[DataMember]
+		[SqlField(DbType.Decimal, 17, Precision = 30, Scale=2, AllowNull = true, IsReadOnly = true, ColumnName ="importe_total" )]		
+		public Decimal? ImporteTotal 
+		{ 
+		    get { return _importeTotal; } 
+			set 
+			{
+			    _importeTotal = value;
+			}
+        }
+
+		private String? _nombreMaterial;
+		[DataMember]
+		[SqlField(DbType.String, 50, ColumnName ="nombre_material" )]		
+		public String? NombreMaterial 
+		{ 
+		    get { return _nombreMaterial; } 
+			set 
+			{
+			    _nombreMaterial = value;
+			}
+        }
+
+		private Int32 _idFactura;
+		[DataMember]
+		[SqlField(DbType.Int32, 4, Precision = 10, ColumnName ="id_factura" )]		
+		public Int32 IdFactura 
+		{ 
+		    get { return _idFactura; } 
+			set 
+			{
+			    _idFactura = value;
+			}
+        }
+
+
+	}
+
+	public partial class LineaSimpleRepository : Repository<LineaSimple> 
+	{
+		public LineaSimpleRepository(DataService DataService) : base(DataService)
+		{
+		}
+
+		public new FacturacionDataService  DataService  
+		{
+			get { return (FacturacionDataService) base.DataService; }
+			set { base.DataService = value; }
+		}
+
+	}
+	// [Obsolete("Use nameof instead")]
+	public static partial class LineaSimpleFields
+	{
+		public const string IdLineaFactura = "IdLineaFactura";
+		public const string Cantidad = "Cantidad";
+		public const string Importe = "Importe";
+		public const string ImporteTotal = "ImporteTotal";
+		public const string NombreMaterial = "NombreMaterial";
+		public const string IdFactura = "IdFactura";
+	}
+
+	public static partial class LineaSimpleProjections
+	{
+		public const string BaseTable = "BaseTable";
+	}
 }
 
 namespace Proyecto_Facturas.Data
@@ -1299,6 +1434,19 @@ namespace Proyecto_Facturas.Data
 					_FacturaSimpleRepository = new Proyecto_Facturas.Data.FacturaSimpleRepository(this);
 				}
 				return _FacturaSimpleRepository;
+			}
+		}
+
+		private Proyecto_Facturas.Data.LineaSimpleRepository _LineaSimpleRepository;
+		public Proyecto_Facturas.Data.LineaSimpleRepository LineaSimpleRepository
+		{
+			get 
+			{
+				if ( _LineaSimpleRepository == null)
+				{
+					_LineaSimpleRepository = new Proyecto_Facturas.Data.LineaSimpleRepository(this);
+				}
+				return _LineaSimpleRepository;
 			}
 		}
 	}

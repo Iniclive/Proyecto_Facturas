@@ -34,8 +34,9 @@
 			new EntitySetting { EntityName = "User", BaseTableName = "Users" },
 			new EntitySetting { EntityName = "Material", BaseTableName = "Materials" },
 			new EntitySetting { EntityName = "Master_data", BaseTableName = "Master_data" },
-			new EntitySetting { EntityName = "FacturaSimple", BaseTableName = "FacturaSimple"}
-			// Agrega Materials y Master_data de la misma forma
+			new EntitySetting { EntityName = "FacturaSimple", BaseTableName = "FacturaSimple"},
+			new EntitySetting { EntityName = "LineaSimple", BaseTableName = "LineaSimple"}
+			
 		},
 		ProcedureSettings = new List<ProcedureSetting> { },
 		EnumSettings = new List<EnumSetting> { }

@@ -70,8 +70,23 @@ namespace FacturacionAPI.Controllers
 
         // DELETE api/<FacturasController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public IActionResult Delete(int id)
         {
+            try
+            {
+                var eliminado = _dataService.FacturaRepository.Delete(id);
+
+                if (!eliminado)
+                {
+                    return NotFound($"No se encontró la factura con id {id}");
+                }
+
+                return NoContent(); // 204 -> eliminación correcta
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al eliminar la factura: {ex.Message}");
+            }
         }
     }
 }
