@@ -94,7 +94,7 @@ namespace Proyecto_Facturas.Data
 
 		private Decimal? _importeIva;
 		[DataMember]
-		[SqlField(DbType.Decimal, 17, Precision = 30, Scale=2, AllowNull = true, IsReadOnly = true, ColumnName ="importe_iva", BaseColumnName ="importe_iva", BaseTableName = "Facturas" )]		
+		[SqlField(DbType.Decimal, 17, Precision = 34, Scale=6, AllowNull = true, IsReadOnly = true, ColumnName ="importe_iva", BaseColumnName ="importe_iva", BaseTableName = "Facturas" )]		
 		public Decimal? ImporteIva 
 		{ 
 		    get { return _importeIva; } 
@@ -106,7 +106,7 @@ namespace Proyecto_Facturas.Data
 
 		private Decimal? _importeTotal;
 		[DataMember]
-		[SqlField(DbType.Decimal, 17, Precision = 31, Scale=2, AllowNull = true, IsReadOnly = true, ColumnName ="importe_total", BaseColumnName ="importe_total", BaseTableName = "Facturas" )]		
+		[SqlField(DbType.Decimal, 17, Precision = 35, Scale=6, AllowNull = true, IsReadOnly = true, ColumnName ="importe_total", BaseColumnName ="importe_total", BaseTableName = "Facturas" )]		
 		public Decimal? ImporteTotal 
 		{ 
 		    get { return _importeTotal; } 
@@ -173,6 +173,30 @@ namespace Proyecto_Facturas.Data
 			set 
 			{
 			    _modificadoPor = value;
+			}
+        }
+
+		private String? _nombreUsuario;
+		[DataMember]
+		[SqlField(DbType.String, 50, ColumnName ="nombreUsuario" )]		
+		public String? NombreUsuario 
+		{ 
+		    get { return _nombreUsuario; } 
+			set 
+			{
+			    _nombreUsuario = value;
+			}
+        }
+
+		private String? _nombreEstado;
+		[DataMember]
+		[SqlField(DbType.String, 50, ColumnName ="nombre_estado" )]		
+		public String? NombreEstado 
+		{ 
+		    get { return _nombreEstado; } 
+			set 
+			{
+			    _nombreEstado = value;
 			}
         }
 
@@ -281,11 +305,14 @@ namespace Proyecto_Facturas.Data
 		public const string CreadoPor = "CreadoPor";
 		public const string Modificado = "Modificado";
 		public const string ModificadoPor = "ModificadoPor";
+		public const string NombreUsuario = "NombreUsuario";
+		public const string NombreEstado = "NombreEstado";
 	}
 
 	public static partial class FacturaProjections
 	{
 		public const string BaseTable = "BaseTable";
+		public const string Basic = "Basic";
 	}
 	[Serializable]
 	[DataContract]
@@ -665,6 +692,30 @@ namespace Proyecto_Facturas.Data
 			}
         }
 
+		private String? _email;
+		[DataMember]
+		[SqlField(DbType.String, 50, ColumnName ="email", BaseColumnName ="email", BaseTableName = "Users" )]		
+		public String? Email 
+		{ 
+		    get { return _email; } 
+			set 
+			{
+			    _email = value;
+			}
+        }
+
+		private String? _password;
+		[DataMember]
+		[SqlField(DbType.String, 50, ColumnName ="password", BaseColumnName ="password", BaseTableName = "Users" )]		
+		public String? Password 
+		{ 
+		    get { return _password; } 
+			set 
+			{
+			    _password = value;
+			}
+        }
+
 
 	}
 
@@ -759,6 +810,8 @@ namespace Proyecto_Facturas.Data
 	{
 		public const string IdUser = "IdUser";
 		public const string Name = "Name";
+		public const string Email = "Email";
+		public const string Password = "Password";
 	}
 
 	public static partial class UserProjections
@@ -1023,6 +1076,114 @@ namespace Proyecto_Facturas.Data
 	{
 		public const string BaseTable = "BaseTable";
 	}
+	[Serializable]
+	[DataContract]
+	[SqlEntity(BaseTableName="FacturaSimple")]
+	public partial class FacturaSimple
+	{
+		private Int32 _idFactura;
+		[DataMember]
+		[SqlField(DbType.Int32, 4, Precision = 10, IsKey=true, ColumnName ="id_factura" )]		
+		public Int32 IdFactura 
+		{ 
+		    get { return _idFactura; } 
+			set 
+			{
+			    _idFactura = value;
+			}
+        }
+
+		private String? _numeroFactura;
+		[DataMember]
+		[SqlField(DbType.String, 150, ColumnName ="numero_factura" )]		
+		public String? NumeroFactura 
+		{ 
+		    get { return _numeroFactura; } 
+			set 
+			{
+			    _numeroFactura = value;
+			}
+        }
+
+		private String? _nombreAseguradora;
+		[DataMember]
+		[SqlField(DbType.String, 50, ColumnName ="nombreAseguradora" )]		
+		public String? NombreAseguradora 
+		{ 
+		    get { return _nombreAseguradora; } 
+			set 
+			{
+			    _nombreAseguradora = value;
+			}
+        }
+
+		private Decimal? _importe;
+		[DataMember]
+		[SqlField(DbType.Decimal, 17, Precision = 19, Scale=2, AllowNull = true, ColumnName ="importe" )]		
+		public Decimal? Importe 
+		{ 
+		    get { return _importe; } 
+			set 
+			{
+			    _importe = value;
+			}
+        }
+
+		private Int32? _tipoIva;
+		[DataMember]
+		[SqlField(DbType.Int32, 4, Precision = 10, AllowNull = true, ColumnName ="tipo_iva" )]		
+		public Int32? TipoIva 
+		{ 
+		    get { return _tipoIva; } 
+			set 
+			{
+			    _tipoIva = value;
+			}
+        }
+
+		private Decimal? _importeTotal;
+		[DataMember]
+		[SqlField(DbType.Decimal, 17, Precision = 35, Scale=6, AllowNull = true, IsReadOnly = true, ColumnName ="importe_total" )]		
+		public Decimal? ImporteTotal 
+		{ 
+		    get { return _importeTotal; } 
+			set 
+			{
+			    _importeTotal = value;
+			}
+        }
+
+
+	}
+
+	public partial class FacturaSimpleRepository : Repository<FacturaSimple> 
+	{
+		public FacturaSimpleRepository(DataService DataService) : base(DataService)
+		{
+		}
+
+		public new FacturacionDataService  DataService  
+		{
+			get { return (FacturacionDataService) base.DataService; }
+			set { base.DataService = value; }
+		}
+
+	}
+	// [Obsolete("Use nameof instead")]
+	public static partial class FacturaSimpleFields
+	{
+		public const string IdFactura = "IdFactura";
+		public const string NumeroFactura = "NumeroFactura";
+		public const string NombreAseguradora = "NombreAseguradora";
+		public const string Importe = "Importe";
+		public const string TipoIva = "TipoIva";
+		public const string ImporteTotal = "ImporteTotal";
+	}
+
+	public static partial class FacturaSimpleProjections
+	{
+		public const string BaseTable = "BaseTable";
+	}
 }
 
 namespace Proyecto_Facturas.Data
@@ -1125,6 +1286,19 @@ namespace Proyecto_Facturas.Data
 					_Master_dataRepository = new Proyecto_Facturas.Data.Master_dataRepository(this);
 				}
 				return _Master_dataRepository;
+			}
+		}
+
+		private Proyecto_Facturas.Data.FacturaSimpleRepository _FacturaSimpleRepository;
+		public Proyecto_Facturas.Data.FacturaSimpleRepository FacturaSimpleRepository
+		{
+			get 
+			{
+				if ( _FacturaSimpleRepository == null)
+				{
+					_FacturaSimpleRepository = new Proyecto_Facturas.Data.FacturaSimpleRepository(this);
+				}
+				return _FacturaSimpleRepository;
 			}
 		}
 	}

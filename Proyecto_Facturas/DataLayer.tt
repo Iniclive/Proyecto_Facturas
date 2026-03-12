@@ -33,7 +33,8 @@
 			new EntitySetting { EntityName = "LineaFactura", BaseTableName = "Lineas_Factura" },
 			new EntitySetting { EntityName = "User", BaseTableName = "Users" },
 			new EntitySetting { EntityName = "Material", BaseTableName = "Materials" },
-			new EntitySetting { EntityName = "Master_data", BaseTableName = "Master_data" }
+			new EntitySetting { EntityName = "Master_data", BaseTableName = "Master_data" },
+			new EntitySetting { EntityName = "FacturaSimple", BaseTableName = "FacturaSimple"}
 			// Agrega Materials y Master_data de la misma forma
 		},
 		ProcedureSettings = new List<ProcedureSetting> { },
