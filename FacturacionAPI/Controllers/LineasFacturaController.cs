@@ -32,7 +32,7 @@ namespace FacturacionAPI.Controllers
 
         // POST api/<LineasFacturaController>
         [HttpPost]
-        public async Task<ActionResult<LineaFacturaResponseDto>> PostAsync([FromBody] LineaFactura nuevaLinea)
+        public async Task<ActionResult<LineaFacturaResponseDto>> GuardarNuevaLinea([FromBody] LineaFactura nuevaLinea)
         {
             _dataService.BeginTransaction();
             try
@@ -69,7 +69,7 @@ namespace FacturacionAPI.Controllers
         }
 
         [HttpPut]
-        public async Task<ActionResult<LineaFacturaResponseDto>> PutAsync([FromBody] LineaFactura nuevaLinea)
+        public async Task<ActionResult<LineaFacturaResponseDto>> ActualizarLinea([FromBody] LineaFactura nuevaLinea)
         {
             _dataService.BeginTransaction();
             try
@@ -90,15 +90,13 @@ namespace FacturacionAPI.Controllers
 
                 _dataService.LineaFacturaRepository.Save(lineaOriginal);
                 var facturaResumen = await ActualizarFacturaAsync(lineaOriginal.IdFactura, usuarioFake, fechaActual);
-                var lineaCompleta = await _dataService.LineaFacturaRepository
-                .GetAsync(LineaFacturaProjections.BaseTable, lineaOriginal.IdLineaFactura);
 
                 if (_dataService.IsActiveTransaction)
                     _dataService.Commit();
 
                 return Ok(new LineaFacturaResponseDto
                 {
-                    Linea = lineaCompleta,
+                    Linea = lineaOriginal,
                     Factura = facturaResumen,
                 });
             }
@@ -110,7 +108,7 @@ namespace FacturacionAPI.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<FacturaResumenDto>> DeleteAsync(int id)
+        public async Task<ActionResult<FacturaResumenDto>> DeleteLinea(int id)
         {
             _dataService.BeginTransaction();
             try

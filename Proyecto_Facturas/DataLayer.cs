@@ -288,7 +288,37 @@ namespace Proyecto_Facturas.Data
 			var entity = new Factura { IdFactura = idFactura };
 			return this.DeleteAsync(entity);
 		}
-			}
+		
+		public void EliminarLineasFacturaAsociadas(Int32? idFactura)
+		{
+            var executor = new StoredProcedureExecutor(this.DataService, true)
+            {
+                GetCommandFunc = () =>
+                {
+                    var proc =  Proyecto_Facturas.Data.StoredProcedures.CreateEliminarLineasFacturaAsociadasProcedure(this.DataService.Connection, this.DataService.EntityLiteProvider.ParameterPrefix, this.DataService.EntityLiteProvider.DefaultSchema);
+					proc.Parameters[this.DataService.EntityLiteProvider.ParameterPrefix + "id_factura"].Value = idFactura == null ? (object) DBNull.Value : idFactura.Value;
+                    return proc;
+                }
+            };
+
+			executor.ExecuteNonQuery();
+		}
+
+		public async System.Threading.Tasks.Task EliminarLineasFacturaAsociadasAsync(Int32? idFactura)
+		{
+            var executor = new StoredProcedureExecutor(this.DataService, true)
+            {
+                GetCommandFunc = () =>
+                {
+                    var proc =  Proyecto_Facturas.Data.StoredProcedures.CreateEliminarLineasFacturaAsociadasProcedure(this.DataService.Connection, this.DataService.EntityLiteProvider.ParameterPrefix, this.DataService.EntityLiteProvider.DefaultSchema);
+					proc.Parameters[this.DataService.EntityLiteProvider.ParameterPrefix + "id_factura"].Value = idFactura == null ? (object) DBNull.Value : idFactura.Value;
+                    return proc;
+                }
+            };
+
+			await executor.ExecuteNonQueryAsync().ConfigureAwait(false);
+		}
+	}
 	// [Obsolete("Use nameof instead")]
 	public static partial class FacturaFields
 	{
@@ -1449,6 +1479,36 @@ namespace Proyecto_Facturas.Data
 				return _LineaSimpleRepository;
 			}
 		}
+	}
+}
+namespace Proyecto_Facturas.Data
+{
+	public static partial class StoredProcedures
+	{
+		public static DbCommand CreateEliminarLineasFacturaAsociadasProcedure(DbConnection connection, string parameterPrefix, string schema = "")
+		{
+			var cmd = connection.CreateCommand();
+			cmd.CommandText = string.IsNullOrEmpty(schema) ? "EliminarLineasFacturaAsociadas" : schema + "." + "EliminarLineasFacturaAsociadas";
+			cmd.CommandType = CommandType.StoredProcedure;
+			IDbDataParameter p = null;
+
+			p = cmd.CreateParameter();
+			p.ParameterName = parameterPrefix + "RETURN_VALUE";
+			p.DbType = DbType.Int32;
+            p.Direction = ParameterDirection.ReturnValue;
+			p.SourceColumn = "RETURN_VALUE";
+			cmd.Parameters.Add(p);
+
+			p = cmd.CreateParameter();
+			p.ParameterName = parameterPrefix + "id_factura";
+			p.DbType = DbType.Int32;
+            p.Direction = ParameterDirection.Input;
+			p.SourceColumn = "id_factura";
+			cmd.Parameters.Add(p);
+
+			return cmd;
+		}
+
 	}
 }
 #pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.

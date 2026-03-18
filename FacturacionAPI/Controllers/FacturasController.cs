@@ -23,7 +23,7 @@ namespace FacturacionAPI.Controllers
 
         // GET: api/<FacturasController>
         [HttpGet]
-        public ActionResult<IEnumerable<Factura>> Get()
+        public ActionResult<IEnumerable<Factura>> GetAllFacturas()
         {
             var facturas = _dataService.FacturaRepository.Query(FacturaProjections.BaseTable).ToList();
             return Ok(facturas);
@@ -31,15 +31,15 @@ namespace FacturacionAPI.Controllers
 
         // GET api/<FacturasController>/5
         [HttpGet("{id}")]
-        public async Task<IActionResult> Get(int id)
+        public async Task<IActionResult> GetFacturaID(int id)
         {
-            var facturas = await _dataService.FacturaRepository.GetAsync(FacturaProjections.Basic, id);
-            return Ok(facturas);
+            var factura = await _dataService.FacturaRepository.GetAsync(FacturaProjections.Basic, id);
+            return Ok(factura);
         }
 
         // POST api/<FacturasController>
         [HttpPost]
-        public ActionResult<Factura> Post([FromBody] Factura nuevaFactura)
+        public ActionResult<Factura> SaveNewFactura([FromBody] Factura nuevaFactura)
         {
             try
             {
@@ -67,7 +67,7 @@ namespace FacturacionAPI.Controllers
 
         // PUT api/<FacturasController>/5
         [HttpPut]
-        public async Task <ActionResult<Factura>> PutPutAsync([FromBody] Factura facturaActualizada)
+        public async Task <ActionResult<Factura>> UpdateFactura([FromBody] Factura facturaActualizada)
         {
             try
             {
@@ -100,10 +100,11 @@ namespace FacturacionAPI.Controllers
 
         // DELETE api/<FacturasController>/5
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public IActionResult DeleteFactura(int id)
         {
             try
             {
+                _dataService.FacturaRepository.EliminarLineasFacturaAsociadas(id);
                 var eliminado = _dataService.FacturaRepository.Delete(id);
 
                 if (!eliminado)

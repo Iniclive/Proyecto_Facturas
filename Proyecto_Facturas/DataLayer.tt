@@ -38,7 +38,15 @@
 			new EntitySetting { EntityName = "LineaSimple", BaseTableName = "LineaSimple"}
 			
 		},
-		ProcedureSettings = new List<ProcedureSetting> { },
+		ProcedureSettings = new List<ProcedureSetting>
+		{
+			new ProcedureSetting 
+			{ 
+			ProcedureName = "EliminarLineasFacturaAsociadas",
+			RelatedEntityName = "Factura",
+       ResultSetKind = ProcedureResultSetKind.None
+			}
+		},
 		EnumSettings = new List<EnumSetting> { }
 	};
 
