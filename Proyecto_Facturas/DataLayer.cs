@@ -763,13 +763,25 @@ namespace Proyecto_Facturas.Data
 
 		private String? _password;
 		[DataMember]
-		[SqlField(DbType.String, 50, ColumnName ="password", BaseColumnName ="password", BaseTableName = "Users" )]		
+		[SqlField(DbType.String, 250, ColumnName ="password", BaseColumnName ="password", BaseTableName = "Users" )]		
 		public String? Password 
 		{ 
 		    get { return _password; } 
 			set 
 			{
 			    _password = value;
+			}
+        }
+
+		private String? _role;
+		[DataMember]
+		[SqlField(DbType.String, 50, ColumnName ="role", BaseColumnName ="role", BaseTableName = "Users" )]		
+		public String? Role 
+		{ 
+		    get { return _role; } 
+			set 
+			{
+			    _role = value;
 			}
         }
 
@@ -869,6 +881,7 @@ namespace Proyecto_Facturas.Data
 		public const string Name = "Name";
 		public const string Email = "Email";
 		public const string Password = "Password";
+		public const string Role = "Role";
 	}
 
 	public static partial class UserProjections
@@ -1349,6 +1362,174 @@ namespace Proyecto_Facturas.Data
 	{
 		public const string BaseTable = "BaseTable";
 	}
+	[Serializable]
+	[DataContract]
+	[SqlEntity(BaseTableName="Refresh_Tokens")]
+	public partial class RefreshToken
+	{
+		private Int32 _idToken;
+		[DataMember]
+		[SqlField(DbType.Int32, 4, Precision = 10, IsKey=true, IsAutoincrement=true, IsReadOnly = true, ColumnName ="id_token", BaseColumnName ="id_token", BaseTableName = "Refresh_Tokens" )]		
+		public Int32 IdToken 
+		{ 
+		    get { return _idToken; } 
+			set 
+			{
+			    _idToken = value;
+			}
+        }
+
+		private Guid _token;
+		[DataMember]
+		[SqlField(DbType.Guid, 16, ColumnName ="token", BaseColumnName ="token", BaseTableName = "Refresh_Tokens" )]		
+		public Guid Token 
+		{ 
+		    get { return _token; } 
+			set 
+			{
+			    _token = value;
+			}
+        }
+
+		private Int32 _userId;
+		[DataMember]
+		[SqlField(DbType.Int32, 4, Precision = 10, ColumnName ="user_id", BaseColumnName ="user_id", BaseTableName = "Refresh_Tokens" )]		
+		public Int32 UserId 
+		{ 
+		    get { return _userId; } 
+			set 
+			{
+			    _userId = value;
+			}
+        }
+
+		private DateTime _expireAt;
+		[DataMember]
+		[SqlField(DbType.DateTime, 8, Precision = 23, Scale=3, ColumnName ="expire_at", BaseColumnName ="expire_at", BaseTableName = "Refresh_Tokens" )]		
+		public DateTime ExpireAt 
+		{ 
+		    get { return _expireAt; } 
+			set 
+			{
+			    _expireAt = value;
+			}
+        }
+
+		private Boolean _revoked;
+		[DataMember]
+		[SqlField(DbType.Boolean, 1, ColumnName ="revoked", BaseColumnName ="revoked", BaseTableName = "Refresh_Tokens" )]		
+		public Boolean Revoked 
+		{ 
+		    get { return _revoked; } 
+			set 
+			{
+			    _revoked = value;
+			}
+        }
+
+
+	}
+
+	public partial class RefreshTokenRepository : Repository<RefreshToken> 
+	{
+		public RefreshTokenRepository(DataService DataService) : base(DataService)
+		{
+		}
+
+		public new FacturacionDataService  DataService  
+		{
+			get { return (FacturacionDataService) base.DataService; }
+			set { base.DataService = value; }
+		}
+
+		public RefreshToken Get(string projectionName, Int32 idToken)
+		{
+			return ((IRepository<RefreshToken>)this).Get(projectionName, idToken, FetchMode.UseIdentityMap);
+		}
+
+		public RefreshToken Get(string projectionName, Int32 idToken, FetchMode fetchMode = FetchMode.UseIdentityMap)
+		{
+			return ((IRepository<RefreshToken>)this).Get(projectionName, idToken, fetchMode);
+		}
+
+		public RefreshToken Get(Projection projection, Int32 idToken)
+		{
+			return ((IRepository<RefreshToken>)this).Get(projection, idToken, FetchMode.UseIdentityMap);
+		}
+
+		public RefreshToken Get(Projection projection, Int32 idToken, FetchMode fetchMode = FetchMode.UseIdentityMap)
+		{
+			return ((IRepository<RefreshToken>)this).Get(projection, idToken, fetchMode);
+		}
+
+		public RefreshToken Get(string projectionName, Int32 idToken, params string[] fields)
+		{
+			return ((IRepository<RefreshToken>)this).Get(projectionName, idToken, fields);
+		}
+
+		public RefreshToken Get(Projection projection, Int32 idToken, params string[] fields)
+		{
+			return ((IRepository<RefreshToken>)this).Get(projection, idToken, fields);
+		}
+
+		public bool Delete(Int32 idToken)
+		{
+			var entity = new RefreshToken { IdToken = idToken };
+			return this.Delete(entity);
+		}
+
+				// asyncrhonous methods
+
+		public System.Threading.Tasks.Task<RefreshToken> GetAsync(string projectionName, Int32 idToken)
+		{
+			return ((IRepository<RefreshToken>)this).GetAsync(projectionName, idToken, FetchMode.UseIdentityMap);
+		}
+
+		public System.Threading.Tasks.Task<RefreshToken> GetAsync(string projectionName, Int32 idToken, FetchMode fetchMode = FetchMode.UseIdentityMap)
+		{
+			return ((IRepository<RefreshToken>)this).GetAsync(projectionName, idToken, fetchMode);
+		}
+
+		public System.Threading.Tasks.Task<RefreshToken> GetAsync(Projection projection, Int32 idToken)
+		{
+			return ((IRepository<RefreshToken>)this).GetAsync(projection, idToken, FetchMode.UseIdentityMap);
+		}
+
+		public System.Threading.Tasks.Task<RefreshToken> GetAsync(Projection projection, Int32 idToken, FetchMode fetchMode = FetchMode.UseIdentityMap)
+		{
+			return ((IRepository<RefreshToken>)this).GetAsync(projection, idToken, fetchMode);
+		}
+
+		public System.Threading.Tasks.Task<RefreshToken> GetAsync(string projectionName, Int32 idToken, params string[] fields)
+		{
+			return ((IRepository<RefreshToken>)this).GetAsync(projectionName, idToken, fields);
+		}
+
+		public System.Threading.Tasks.Task<RefreshToken> GetAsync(Projection projection, Int32 idToken, params string[] fields)
+		{
+			return ((IRepository<RefreshToken>)this).GetAsync(projection, idToken, fields);
+		}
+
+		public System.Threading.Tasks.Task<bool> DeleteAsync(Int32 idToken)
+		{
+			var entity = new RefreshToken { IdToken = idToken };
+			return this.DeleteAsync(entity);
+		}
+			}
+	// [Obsolete("Use nameof instead")]
+	public static partial class RefreshTokenFields
+	{
+		public const string IdToken = "IdToken";
+		public const string Token = "Token";
+		public const string UserId = "UserId";
+		public const string ExpireAt = "ExpireAt";
+		public const string Revoked = "Revoked";
+	}
+
+	public static partial class RefreshTokenProjections
+	{
+		public const string BaseTable = "BaseTable";
+	}
 }
 
 namespace Proyecto_Facturas.Data
@@ -1477,6 +1658,19 @@ namespace Proyecto_Facturas.Data
 					_LineaSimpleRepository = new Proyecto_Facturas.Data.LineaSimpleRepository(this);
 				}
 				return _LineaSimpleRepository;
+			}
+		}
+
+		private Proyecto_Facturas.Data.RefreshTokenRepository _RefreshTokenRepository;
+		public Proyecto_Facturas.Data.RefreshTokenRepository RefreshTokenRepository
+		{
+			get 
+			{
+				if ( _RefreshTokenRepository == null)
+				{
+					_RefreshTokenRepository = new Proyecto_Facturas.Data.RefreshTokenRepository(this);
+				}
+				return _RefreshTokenRepository;
 			}
 		}
 	}

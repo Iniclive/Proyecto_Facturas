@@ -35,7 +35,8 @@
 			new EntitySetting { EntityName = "Material", BaseTableName = "Materials" },
 			new EntitySetting { EntityName = "Master_data", BaseTableName = "Master_data" },
 			new EntitySetting { EntityName = "FacturaSimple", BaseTableName = "FacturaSimple"},
-			new EntitySetting { EntityName = "LineaSimple", BaseTableName = "LineaSimple"}
+			new EntitySetting { EntityName = "LineaSimple", BaseTableName = "LineaSimple"},
+			new EntitySetting { EntityName = "RefreshToken", BaseTableName = "Refresh_Tokens"}
 			
 		},
 		ProcedureSettings = new List<ProcedureSetting>
