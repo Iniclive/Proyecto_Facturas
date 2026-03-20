@@ -8,6 +8,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.Extensions.Configuration;
+using FacturacionAPI.DTOs.Lineas;
 
 namespace FacturacionAPI.Controllers
 {
@@ -24,7 +25,7 @@ namespace FacturacionAPI.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register(RegisterUserDto userReg)
+        public async Task<ActionResult<UserRegisteredDto>> Register(RegisterUserDto userReg)
         {
             try
             {
@@ -46,9 +47,13 @@ namespace FacturacionAPI.Controllers
                     Role = "user"
                 };
 
-               await  _dataService.UserRepository.SaveAsync(newUser);
+                await _dataService.UserRepository.SaveAsync(newUser);
 
-                return Ok(newUser.Email);
+                return Ok(new UserRegisteredDto
+                {
+                    Name = newUser.Name,
+                    Email = newUser.Email,
+                });
             }
             catch (Exception ex) {
                 return StatusCode(500, $"Error al crear el usuario: {ex.Message}");
