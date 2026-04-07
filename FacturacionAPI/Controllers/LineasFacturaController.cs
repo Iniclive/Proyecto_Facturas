@@ -1,4 +1,5 @@
-﻿using FacturacionAPI.DTOs.Facturas;
+﻿using System.Security.Claims;
+using FacturacionAPI.DTOs.Facturas;
 using FacturacionAPI.DTOs.Lineas;
 using inercya.EntityLite;
 using Microsoft.AspNetCore.Mvc;
@@ -41,15 +42,15 @@ namespace FacturacionAPI.Controllers
                 {
                     return BadRequest("Los datos de la linea son nulos.");
                 }
-                int usuarioFake = 1;
+                int userId = User.GetUserId();
                 var fechaActual = DateTime.UtcNow;
                 nuevaLinea.Creado = fechaActual;
                 nuevaLinea.Modificado = fechaActual;
-                nuevaLinea.CreadoPor = usuarioFake;
-                nuevaLinea.ModificadoPor = usuarioFake;
+                nuevaLinea.CreadoPor = userId;
+                nuevaLinea.ModificadoPor = userId;
 
                 await _dataService.LineaFacturaRepository.SaveAsync(nuevaLinea);
-                var facturaResumen = await ActualizarFacturaAsync(nuevaLinea.IdFactura, usuarioFake, fechaActual);
+                var facturaResumen = await ActualizarFacturaAsync(nuevaLinea.IdFactura, userId, fechaActual);
                 var lineaCompleta =  await _dataService.LineaFacturaRepository
                 .GetAsync(LineaFacturaProjections.BaseTable, nuevaLinea.IdLineaFactura);
 
@@ -80,16 +81,16 @@ namespace FacturacionAPI.Controllers
                 }
                 var lineaOriginal = await _dataService.LineaFacturaRepository
                 .GetAsync(LineaFacturaProjections.BaseTable, nuevaLinea.IdLineaFactura);
-                int usuarioFake = 1;
+                int userId = User.GetUserId();
                 var fechaActual = DateTime.UtcNow;
                 lineaOriginal.Modificado = fechaActual;
-                lineaOriginal.ModificadoPor = usuarioFake;
+                lineaOriginal.ModificadoPor = userId;
                 lineaOriginal.Cantidad = nuevaLinea.Cantidad;
                 lineaOriginal.Importe = nuevaLinea.Importe;
                 lineaOriginal.IdMaterial = nuevaLinea.IdMaterial;
 
                 _dataService.LineaFacturaRepository.Save(lineaOriginal);
-                var facturaResumen = await ActualizarFacturaAsync(lineaOriginal.IdFactura, usuarioFake, fechaActual);
+                var facturaResumen = await ActualizarFacturaAsync(lineaOriginal.IdFactura, userId, fechaActual);
 
                 if (_dataService.IsActiveTransaction)
                     _dataService.Commit();
@@ -113,14 +114,14 @@ namespace FacturacionAPI.Controllers
             _dataService.BeginTransaction();
             try
             {
-                
-                int usuarioFake = 1;
+
+                int userId = User.GetUserId();
                 var fechaActual = DateTime.UtcNow;
                 var lineaActual =  await _dataService.LineaFacturaRepository.GetAsync(LineaFacturaProjections.BaseTable, id);
                 var idFactura = lineaActual.IdFactura;
 
                 await _dataService.LineaFacturaRepository.DeleteAsync(id);
-                var facturaResumen = await ActualizarFacturaAsync(idFactura, usuarioFake, fechaActual);
+                var facturaResumen = await ActualizarFacturaAsync(idFactura, userId, fechaActual);
                 if (_dataService.IsActiveTransaction)
                     _dataService.Commit();
                 return Ok(facturaResumen);

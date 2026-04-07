@@ -200,6 +200,18 @@ namespace Proyecto_Facturas.Data
 			}
         }
 
+		private String? _nombreAseguradora;
+		[DataMember]
+		[SqlField(DbType.String, 50, ColumnName ="nombreAseguradora" )]		
+		public String? NombreAseguradora 
+		{ 
+		    get { return _nombreAseguradora; } 
+			set 
+			{
+			    _nombreAseguradora = value;
+			}
+        }
+
 
 	}
 
@@ -337,6 +349,7 @@ namespace Proyecto_Facturas.Data
 		public const string ModificadoPor = "ModificadoPor";
 		public const string NombreUsuario = "NombreUsuario";
 		public const string NombreEstado = "NombreEstado";
+		public const string NombreAseguradora = "NombreAseguradora";
 	}
 
 	public static partial class FacturaProjections

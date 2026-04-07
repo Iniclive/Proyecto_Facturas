@@ -9,6 +9,7 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using FacturacionAPI.DTOs.Lineas;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FacturacionAPI.Controllers
 {
@@ -18,10 +19,10 @@ namespace FacturacionAPI.Controllers
     {
         private readonly FacturacionDataService _dataService;
         private readonly IConfiguration _configuration;
-        public AuthController(FacturacionDataService dataService)
+        public AuthController(FacturacionDataService dataService, IConfiguration configuration)
         {
             _dataService = dataService;
-            _configuration = _configuration;
+            _configuration = configuration;
         }
 
         [HttpPost("register")]
@@ -76,10 +77,39 @@ namespace FacturacionAPI.Controllers
 
            
             var token = GenerateAccessToken(user);
-            var refreshToken = GenerateRefreshTokenAsync(user.IdUser);
-            return Ok(new { Token = token,
+            //var refreshToken = GenerateRefreshTokenAsync(user.IdUser);
+            /*var cookieOptions = new CookieOptions //Queda pendiente de gestionar uso https en el front
+            {
+                HttpOnly = true,   // JavaScript no puede leerla
+                Secure = true,     // Solo viaja por HTTPS
+                SameSite = SameSiteMode.None, // Evita que se envíe desde otros sitios (protección CSRF)
+                Expires = DateTime.UtcNow.AddDays(1)
+            };*/
+            
+            //var isDevelopment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
+        
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = false,
+                SameSite = SameSiteMode.Lax,
+                Expires = DateTime.UtcNow.AddDays(1),
+                Path = "/"
+            };
+
+            Response.Cookies.Append("jwt_token", token, cookieOptions);
+
+            return Ok(new
+            {
+                id = user.IdUser.ToString(),
+                name = user.Name,
+                email = user.Email,
+                role = user.Role
+            });
+            //return Ok(new { AccessToken = token });
+            /*return Ok(new { AccessToken = token,
                             RefreshToken = refreshToken
-                            });
+                            });*/
         }
 
         private string GenerateAccessToken(User user)
@@ -91,16 +121,17 @@ namespace FacturacionAPI.Controllers
             var claims = new[]
             {
                 new Claim("sub",   user.IdUser.ToString()),
+                new Claim("name",  user.Name),
                 new Claim("email", user.Email),
                 new Claim("role",  user.Role),
-                new Claim("jti",   Guid.NewGuid().ToString())
-    };
+                //new Claim("jti",   Guid.NewGuid().ToString())
+            };
 
             var token = new JwtSecurityToken(
                 issuer: _configuration["Jwt:Issuer"],
                 audience: _configuration["Jwt:Audience"],
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(15),
+                expires: DateTime.UtcNow.AddDays(1),
                 signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
@@ -175,5 +206,43 @@ namespace FacturacionAPI.Controllers
 
             return refreshToken;
         }
+
+        [Authorize]
+        [HttpGet("me")]
+        public ActionResult GetMe()
+        {
+            return Ok(new UserInfoDto
+            {
+                Id    = User.FindFirst("sub")?.Value,
+                Name  = User.FindFirst("name")?.Value,
+                Email = User.FindFirst("email")?.Value,
+                Role  = User.FindFirst("role")?.Value
+            });
+        }
+
+        [Authorize]
+        [HttpPost("logout")]
+        public IActionResult Logout()
+        {
+            // Si no existe la cookie, no hay sesión activa
+            if (!Request.Cookies.ContainsKey("jwt_token"))
+                return BadRequest("No hay sesión activa.");
+
+            // Eliminamos la cookie con las mismas opciones con las que fue creada
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = false,
+                SameSite = SameSiteMode.Lax,
+                Expires = DateTime.UtcNow.AddDays(-1), // Fecha en el pasado para forzar expiración
+                Path = "/"
+            };
+
+            Response.Cookies.Append("jwt_token", "", cookieOptions);
+
+            return Ok(new { message = "Sesión cerrada correctamente." });
+        }
+
     }
 }
+

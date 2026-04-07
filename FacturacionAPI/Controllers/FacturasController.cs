@@ -3,11 +3,15 @@ using Microsoft.AspNetCore.Mvc;
 using Proyecto_Facturas.Data;
 using FacturacionAPI.DTOs.Facturas;
 using FacturacionAPI.DTOs.Lineas;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+using System.Linq.Expressions;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace FacturacionAPI.Controllers
 {
+    
     [Route("api/[controller]")]
     [ApiController]
     public class FacturasController : ControllerBase
@@ -22,22 +26,51 @@ namespace FacturacionAPI.Controllers
 
 
         // GET: api/<FacturasController>
+        [Authorize]
         [HttpGet]
-        public ActionResult<IEnumerable<Factura>> GetAllFacturas()
+        public async Task<ActionResult<IEnumerable<Factura>>> GetFacturas()
         {
-            var facturas = _dataService.FacturaRepository.Query(FacturaProjections.BaseTable).ToList();
+            
+            int userId = User.GetUserId();
+            
+            var query = _dataService.FacturaRepository.Query(FacturaProjections.Basic);
+
+            if (!User.IsInRole("admin")) //Como esta asignado desde el builder podemos usar IsInRole
+            {
+                query.Where(FacturaFields.CreadoPor, userId);
+            }
+
+            var facturas = await query.ToListAsync();
             return Ok(facturas);
         }
 
         // GET api/<FacturasController>/5
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetFacturaID(int id)
         {
-            var factura = await _dataService.FacturaRepository.GetAsync(FacturaProjections.Basic, id);
-            return Ok(factura);
+            try
+            {
+                var factura = await _dataService.FacturaRepository.GetAsync(FacturaProjections.Basic, id);
+                int userId = User.GetUserId();
+                if (factura == null) {
+                    return BadRequest("No se ha encontrado la factura");
+                }
+                if (!User.IsInRole("admin") && factura.CreadoPor != userId)
+                {
+                    return Forbid();
+                }
+                return Ok(factura); 
+            }
+                catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized("No se pudo identificar al usuario.");
+            }
         }
+        
 
         // POST api/<FacturasController>
+        [Authorize]
         [HttpPost]
         public ActionResult<Factura> SaveNewFactura([FromBody] Factura nuevaFactura)
         {
@@ -47,17 +80,19 @@ namespace FacturacionAPI.Controllers
                 {
                     return BadRequest("Los datos de la factura son nulos.");
                 }
-                int usuarioFake = 1;
+                int userId = User.GetUserId();
 
                 nuevaFactura.Creado = DateTime.UtcNow;
                 nuevaFactura.Modificado = DateTime.UtcNow;
 
-                nuevaFactura.CreadoPor = usuarioFake;
-                nuevaFactura.ModificadoPor = usuarioFake;
-
+                nuevaFactura.CreadoPor = userId;
+                nuevaFactura.ModificadoPor = userId;
                 _dataService.FacturaRepository.Save(nuevaFactura);
 
                 return Ok(nuevaFactura);
+            }
+            catch (UnauthorizedAccessException ex) {
+                return Unauthorized("No se pudo identificar al usuario.");
             }
             catch (Exception ex)
             {
@@ -66,6 +101,7 @@ namespace FacturacionAPI.Controllers
         }
 
         // PUT api/<FacturasController>/5
+        [Authorize]
         [HttpPut]
         public async Task <ActionResult<Factura>> UpdateFactura([FromBody] Factura facturaActualizada)
         {
@@ -77,10 +113,10 @@ namespace FacturacionAPI.Controllers
                 }
                 var facturaAntigua = await _dataService.FacturaRepository
                 .GetAsync(FacturaProjections.BaseTable, facturaActualizada.IdFactura);
-                int usuarioFake = 1;
+                int userId = User.GetUserId();
                 var fechaActual = DateTime.UtcNow;
                 facturaAntigua.Modificado = fechaActual;
-                facturaAntigua.ModificadoPor = usuarioFake;
+                facturaAntigua.ModificadoPor = userId;
                 facturaAntigua.FechaFactura = facturaActualizada.FechaFactura;
                 facturaAntigua.TipoIva = facturaActualizada.TipoIva;
                 facturaAntigua.Aseguradora = facturaActualizada.Aseguradora;
@@ -99,6 +135,7 @@ namespace FacturacionAPI.Controllers
         }
 
         // DELETE api/<FacturasController>/5
+        [Authorize]
         [HttpDelete("{id}")]
         public IActionResult DeleteFactura(int id)
         {
