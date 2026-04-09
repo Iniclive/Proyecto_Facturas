@@ -176,39 +176,75 @@ namespace Proyecto_Facturas.Data
 			}
         }
 
-		private String? _nombreUsuario;
+		private Int32 _clientId;
 		[DataMember]
-		[SqlField(DbType.String, 50, ColumnName ="nombreUsuario" )]		
-		public String? NombreUsuario 
+		[SqlField(DbType.Int32, 4, Precision = 10, ColumnName ="client_id", BaseColumnName ="client_id", BaseTableName = "Facturas" )]		
+		public Int32 ClientId 
 		{ 
-		    get { return _nombreUsuario; } 
+		    get { return _clientId; } 
 			set 
 			{
-			    _nombreUsuario = value;
+			    _clientId = value;
 			}
         }
 
-		private String? _nombreEstado;
+		private String? _insuranceName;
 		[DataMember]
-		[SqlField(DbType.String, 50, ColumnName ="nombre_estado" )]		
-		public String? NombreEstado 
+		[SqlField(DbType.String, 50, ColumnName ="insurance_name" )]		
+		public String? InsuranceName 
 		{ 
-		    get { return _nombreEstado; } 
+		    get { return _insuranceName; } 
 			set 
 			{
-			    _nombreEstado = value;
+			    _insuranceName = value;
 			}
         }
 
-		private String? _nombreAseguradora;
+		private String? _statusName;
 		[DataMember]
-		[SqlField(DbType.String, 50, ColumnName ="nombreAseguradora" )]		
-		public String? NombreAseguradora 
+		[SqlField(DbType.String, 50, ColumnName ="status_name" )]		
+		public String? StatusName 
 		{ 
-		    get { return _nombreAseguradora; } 
+		    get { return _statusName; } 
 			set 
 			{
-			    _nombreAseguradora = value;
+			    _statusName = value;
+			}
+        }
+
+		private String? _userName;
+		[DataMember]
+		[SqlField(DbType.String, 50, ColumnName ="user_name" )]		
+		public String? UserName 
+		{ 
+		    get { return _userName; } 
+			set 
+			{
+			    _userName = value;
+			}
+        }
+
+		private String? _clientCif;
+		[DataMember]
+		[SqlField(DbType.String, 9, ColumnName ="client_cif" )]		
+		public String? ClientCif 
+		{ 
+		    get { return _clientCif; } 
+			set 
+			{
+			    _clientCif = value;
+			}
+        }
+
+		private String? _clientCommercialName;
+		[DataMember]
+		[SqlField(DbType.String, 150, ColumnName ="client_commercial_name" )]		
+		public String? ClientCommercialName 
+		{ 
+		    get { return _clientCommercialName; } 
+			set 
+			{
+			    _clientCommercialName = value;
 			}
         }
 
@@ -347,9 +383,12 @@ namespace Proyecto_Facturas.Data
 		public const string CreadoPor = "CreadoPor";
 		public const string Modificado = "Modificado";
 		public const string ModificadoPor = "ModificadoPor";
-		public const string NombreUsuario = "NombreUsuario";
-		public const string NombreEstado = "NombreEstado";
-		public const string NombreAseguradora = "NombreAseguradora";
+		public const string ClientId = "ClientId";
+		public const string InsuranceName = "InsuranceName";
+		public const string StatusName = "StatusName";
+		public const string UserName = "UserName";
+		public const string ClientCif = "ClientCif";
+		public const string ClientCommercialName = "ClientCommercialName";
 	}
 
 	public static partial class FacturaProjections
@@ -886,7 +925,37 @@ namespace Proyecto_Facturas.Data
 			var entity = new User { IdUser = idUser };
 			return this.DeleteAsync(entity);
 		}
-			}
+		
+		public void DeleteUserWithInvoices(Int32? userId)
+		{
+            var executor = new StoredProcedureExecutor(this.DataService, true)
+            {
+                GetCommandFunc = () =>
+                {
+                    var proc =  Proyecto_Facturas.Data.StoredProcedures.CreateDeleteUserWithInvoicesProcedure(this.DataService.Connection, this.DataService.EntityLiteProvider.ParameterPrefix, this.DataService.EntityLiteProvider.DefaultSchema);
+					proc.Parameters[this.DataService.EntityLiteProvider.ParameterPrefix + "user_id"].Value = userId == null ? (object) DBNull.Value : userId.Value;
+                    return proc;
+                }
+            };
+
+			executor.ExecuteNonQuery();
+		}
+
+		public async System.Threading.Tasks.Task DeleteUserWithInvoicesAsync(Int32? userId)
+		{
+            var executor = new StoredProcedureExecutor(this.DataService, true)
+            {
+                GetCommandFunc = () =>
+                {
+                    var proc =  Proyecto_Facturas.Data.StoredProcedures.CreateDeleteUserWithInvoicesProcedure(this.DataService.Connection, this.DataService.EntityLiteProvider.ParameterPrefix, this.DataService.EntityLiteProvider.DefaultSchema);
+					proc.Parameters[this.DataService.EntityLiteProvider.ParameterPrefix + "user_id"].Value = userId == null ? (object) DBNull.Value : userId.Value;
+                    return proc;
+                }
+            };
+
+			await executor.ExecuteNonQueryAsync().ConfigureAwait(false);
+		}
+	}
 	// [Obsolete("Use nameof instead")]
 	public static partial class UserFields
 	{
@@ -1032,39 +1101,39 @@ namespace Proyecto_Facturas.Data
 	}
 	[Serializable]
 	[DataContract]
-	[SqlEntity(BaseTableName="Master_data")]
-	public partial class Master_data
+	[SqlEntity(BaseTableName="Invoice_Status")]
+	public partial class InvoiceStatus
 	{
-		private Int32 _idEstado;
+		private Int32 _statusId;
 		[DataMember]
-		[SqlField(DbType.Int32, 4, Precision = 10, IsKey=true, IsAutoincrement=true, IsReadOnly = true, ColumnName ="id_estado", BaseColumnName ="id_estado", BaseTableName = "Master_data" )]		
-		public Int32 IdEstado 
+		[SqlField(DbType.Int32, 4, Precision = 10, IsKey=true, IsAutoincrement=true, IsReadOnly = true, ColumnName ="status_id", BaseColumnName ="status_id", BaseTableName = "Invoice_Status" )]		
+		public Int32 StatusId 
 		{ 
-		    get { return _idEstado; } 
+		    get { return _statusId; } 
 			set 
 			{
-			    _idEstado = value;
+			    _statusId = value;
 			}
         }
 
-		private String? _nombreEstado;
+		private String? _statusName;
 		[DataMember]
-		[SqlField(DbType.String, 50, ColumnName ="nombre_estado", BaseColumnName ="nombre_estado", BaseTableName = "Master_data" )]		
-		public String? NombreEstado 
+		[SqlField(DbType.String, 50, ColumnName ="status_name", BaseColumnName ="status_name", BaseTableName = "Invoice_Status" )]		
+		public String? StatusName 
 		{ 
-		    get { return _nombreEstado; } 
+		    get { return _statusName; } 
 			set 
 			{
-			    _nombreEstado = value;
+			    _statusName = value;
 			}
         }
 
 
 	}
 
-	public partial class Master_dataRepository : Repository<Master_data> 
+	public partial class InvoiceStatusRepository : Repository<InvoiceStatus> 
 	{
-		public Master_dataRepository(DataService DataService) : base(DataService)
+		public InvoiceStatusRepository(DataService DataService) : base(DataService)
 		{
 		}
 
@@ -1074,88 +1143,88 @@ namespace Proyecto_Facturas.Data
 			set { base.DataService = value; }
 		}
 
-		public Master_data Get(string projectionName, Int32 idEstado)
+		public InvoiceStatus Get(string projectionName, Int32 statusId)
 		{
-			return ((IRepository<Master_data>)this).Get(projectionName, idEstado, FetchMode.UseIdentityMap);
+			return ((IRepository<InvoiceStatus>)this).Get(projectionName, statusId, FetchMode.UseIdentityMap);
 		}
 
-		public Master_data Get(string projectionName, Int32 idEstado, FetchMode fetchMode = FetchMode.UseIdentityMap)
+		public InvoiceStatus Get(string projectionName, Int32 statusId, FetchMode fetchMode = FetchMode.UseIdentityMap)
 		{
-			return ((IRepository<Master_data>)this).Get(projectionName, idEstado, fetchMode);
+			return ((IRepository<InvoiceStatus>)this).Get(projectionName, statusId, fetchMode);
 		}
 
-		public Master_data Get(Projection projection, Int32 idEstado)
+		public InvoiceStatus Get(Projection projection, Int32 statusId)
 		{
-			return ((IRepository<Master_data>)this).Get(projection, idEstado, FetchMode.UseIdentityMap);
+			return ((IRepository<InvoiceStatus>)this).Get(projection, statusId, FetchMode.UseIdentityMap);
 		}
 
-		public Master_data Get(Projection projection, Int32 idEstado, FetchMode fetchMode = FetchMode.UseIdentityMap)
+		public InvoiceStatus Get(Projection projection, Int32 statusId, FetchMode fetchMode = FetchMode.UseIdentityMap)
 		{
-			return ((IRepository<Master_data>)this).Get(projection, idEstado, fetchMode);
+			return ((IRepository<InvoiceStatus>)this).Get(projection, statusId, fetchMode);
 		}
 
-		public Master_data Get(string projectionName, Int32 idEstado, params string[] fields)
+		public InvoiceStatus Get(string projectionName, Int32 statusId, params string[] fields)
 		{
-			return ((IRepository<Master_data>)this).Get(projectionName, idEstado, fields);
+			return ((IRepository<InvoiceStatus>)this).Get(projectionName, statusId, fields);
 		}
 
-		public Master_data Get(Projection projection, Int32 idEstado, params string[] fields)
+		public InvoiceStatus Get(Projection projection, Int32 statusId, params string[] fields)
 		{
-			return ((IRepository<Master_data>)this).Get(projection, idEstado, fields);
+			return ((IRepository<InvoiceStatus>)this).Get(projection, statusId, fields);
 		}
 
-		public bool Delete(Int32 idEstado)
+		public bool Delete(Int32 statusId)
 		{
-			var entity = new Master_data { IdEstado = idEstado };
+			var entity = new InvoiceStatus { StatusId = statusId };
 			return this.Delete(entity);
 		}
 
 				// asyncrhonous methods
 
-		public System.Threading.Tasks.Task<Master_data> GetAsync(string projectionName, Int32 idEstado)
+		public System.Threading.Tasks.Task<InvoiceStatus> GetAsync(string projectionName, Int32 statusId)
 		{
-			return ((IRepository<Master_data>)this).GetAsync(projectionName, idEstado, FetchMode.UseIdentityMap);
+			return ((IRepository<InvoiceStatus>)this).GetAsync(projectionName, statusId, FetchMode.UseIdentityMap);
 		}
 
-		public System.Threading.Tasks.Task<Master_data> GetAsync(string projectionName, Int32 idEstado, FetchMode fetchMode = FetchMode.UseIdentityMap)
+		public System.Threading.Tasks.Task<InvoiceStatus> GetAsync(string projectionName, Int32 statusId, FetchMode fetchMode = FetchMode.UseIdentityMap)
 		{
-			return ((IRepository<Master_data>)this).GetAsync(projectionName, idEstado, fetchMode);
+			return ((IRepository<InvoiceStatus>)this).GetAsync(projectionName, statusId, fetchMode);
 		}
 
-		public System.Threading.Tasks.Task<Master_data> GetAsync(Projection projection, Int32 idEstado)
+		public System.Threading.Tasks.Task<InvoiceStatus> GetAsync(Projection projection, Int32 statusId)
 		{
-			return ((IRepository<Master_data>)this).GetAsync(projection, idEstado, FetchMode.UseIdentityMap);
+			return ((IRepository<InvoiceStatus>)this).GetAsync(projection, statusId, FetchMode.UseIdentityMap);
 		}
 
-		public System.Threading.Tasks.Task<Master_data> GetAsync(Projection projection, Int32 idEstado, FetchMode fetchMode = FetchMode.UseIdentityMap)
+		public System.Threading.Tasks.Task<InvoiceStatus> GetAsync(Projection projection, Int32 statusId, FetchMode fetchMode = FetchMode.UseIdentityMap)
 		{
-			return ((IRepository<Master_data>)this).GetAsync(projection, idEstado, fetchMode);
+			return ((IRepository<InvoiceStatus>)this).GetAsync(projection, statusId, fetchMode);
 		}
 
-		public System.Threading.Tasks.Task<Master_data> GetAsync(string projectionName, Int32 idEstado, params string[] fields)
+		public System.Threading.Tasks.Task<InvoiceStatus> GetAsync(string projectionName, Int32 statusId, params string[] fields)
 		{
-			return ((IRepository<Master_data>)this).GetAsync(projectionName, idEstado, fields);
+			return ((IRepository<InvoiceStatus>)this).GetAsync(projectionName, statusId, fields);
 		}
 
-		public System.Threading.Tasks.Task<Master_data> GetAsync(Projection projection, Int32 idEstado, params string[] fields)
+		public System.Threading.Tasks.Task<InvoiceStatus> GetAsync(Projection projection, Int32 statusId, params string[] fields)
 		{
-			return ((IRepository<Master_data>)this).GetAsync(projection, idEstado, fields);
+			return ((IRepository<InvoiceStatus>)this).GetAsync(projection, statusId, fields);
 		}
 
-		public System.Threading.Tasks.Task<bool> DeleteAsync(Int32 idEstado)
+		public System.Threading.Tasks.Task<bool> DeleteAsync(Int32 statusId)
 		{
-			var entity = new Master_data { IdEstado = idEstado };
+			var entity = new InvoiceStatus { StatusId = statusId };
 			return this.DeleteAsync(entity);
 		}
 			}
 	// [Obsolete("Use nameof instead")]
-	public static partial class Master_dataFields
+	public static partial class InvoiceStatusFields
 	{
-		public const string IdEstado = "IdEstado";
-		public const string NombreEstado = "NombreEstado";
+		public const string StatusId = "StatusId";
+		public const string StatusName = "StatusName";
 	}
 
-	public static partial class Master_dataProjections
+	public static partial class InvoiceStatusProjections
 	{
 		public const string BaseTable = "BaseTable";
 	}
@@ -1377,75 +1446,111 @@ namespace Proyecto_Facturas.Data
 	}
 	[Serializable]
 	[DataContract]
-	[SqlEntity(BaseTableName="Refresh_Tokens")]
-	public partial class RefreshToken
+	[SqlEntity(BaseTableName="Clients")]
+	public partial class Client
 	{
-		private Int32 _idToken;
+		private Int32 _clientId;
 		[DataMember]
-		[SqlField(DbType.Int32, 4, Precision = 10, IsKey=true, IsAutoincrement=true, IsReadOnly = true, ColumnName ="id_token", BaseColumnName ="id_token", BaseTableName = "Refresh_Tokens" )]		
-		public Int32 IdToken 
+		[SqlField(DbType.Int32, 4, Precision = 10, IsKey=true, IsAutoincrement=true, IsReadOnly = true, ColumnName ="client_id", BaseColumnName ="client_id", BaseTableName = "Clients" )]		
+		public Int32 ClientId 
 		{ 
-		    get { return _idToken; } 
+		    get { return _clientId; } 
 			set 
 			{
-			    _idToken = value;
+			    _clientId = value;
 			}
         }
 
-		private Guid _token;
+		private String? _commercialName;
 		[DataMember]
-		[SqlField(DbType.Guid, 16, ColumnName ="token", BaseColumnName ="token", BaseTableName = "Refresh_Tokens" )]		
-		public Guid Token 
+		[SqlField(DbType.String, 150, ColumnName ="commercial_name", BaseColumnName ="commercial_name", BaseTableName = "Clients" )]		
+		public String? CommercialName 
 		{ 
-		    get { return _token; } 
+		    get { return _commercialName; } 
 			set 
 			{
-			    _token = value;
+			    _commercialName = value;
 			}
         }
 
-		private Int32 _userId;
+		private String? _legalName;
 		[DataMember]
-		[SqlField(DbType.Int32, 4, Precision = 10, ColumnName ="user_id", BaseColumnName ="user_id", BaseTableName = "Refresh_Tokens" )]		
-		public Int32 UserId 
+		[SqlField(DbType.String, 150, ColumnName ="legal_name", BaseColumnName ="legal_name", BaseTableName = "Clients" )]		
+		public String? LegalName 
 		{ 
-		    get { return _userId; } 
+		    get { return _legalName; } 
 			set 
 			{
-			    _userId = value;
+			    _legalName = value;
 			}
         }
 
-		private DateTime _expireAt;
+		private String? _cif;
 		[DataMember]
-		[SqlField(DbType.DateTime, 8, Precision = 23, Scale=3, ColumnName ="expire_at", BaseColumnName ="expire_at", BaseTableName = "Refresh_Tokens" )]		
-		public DateTime ExpireAt 
+		[SqlField(DbType.String, 9, ColumnName ="cif", BaseColumnName ="cif", BaseTableName = "Clients" )]		
+		public String? Cif 
 		{ 
-		    get { return _expireAt; } 
+		    get { return _cif; } 
 			set 
 			{
-			    _expireAt = value;
+			    _cif = value;
 			}
         }
 
-		private Boolean _revoked;
+		private String? _email;
 		[DataMember]
-		[SqlField(DbType.Boolean, 1, ColumnName ="revoked", BaseColumnName ="revoked", BaseTableName = "Refresh_Tokens" )]		
-		public Boolean Revoked 
+		[SqlField(DbType.String, 50, ColumnName ="email", BaseColumnName ="email", BaseTableName = "Clients" )]		
+		public String? Email 
 		{ 
-		    get { return _revoked; } 
+		    get { return _email; } 
 			set 
 			{
-			    _revoked = value;
+			    _email = value;
+			}
+        }
+
+		private String? _phone;
+		[DataMember]
+		[SqlField(DbType.String, 20, ColumnName ="phone", BaseColumnName ="phone", BaseTableName = "Clients" )]		
+		public String? Phone 
+		{ 
+		    get { return _phone; } 
+			set 
+			{
+			    _phone = value;
+			}
+        }
+
+		private String? _address;
+		[DataMember]
+		[SqlField(DbType.String, 150, ColumnName ="address", BaseColumnName ="address", BaseTableName = "Clients" )]		
+		public String? Address 
+		{ 
+		    get { return _address; } 
+			set 
+			{
+			    _address = value;
+			}
+        }
+
+		private DateTime _creationDate;
+		[DataMember]
+		[SqlField(DbType.DateTime, 8, Precision = 23, Scale=3, ColumnName ="creation_date", BaseColumnName ="creation_date", BaseTableName = "Clients" )]		
+		public DateTime CreationDate 
+		{ 
+		    get { return _creationDate; } 
+			set 
+			{
+			    _creationDate = value;
 			}
         }
 
 
 	}
 
-	public partial class RefreshTokenRepository : Repository<RefreshToken> 
+	public partial class ClientRepository : Repository<Client> 
 	{
-		public RefreshTokenRepository(DataService DataService) : base(DataService)
+		public ClientRepository(DataService DataService) : base(DataService)
 		{
 		}
 
@@ -1455,91 +1560,193 @@ namespace Proyecto_Facturas.Data
 			set { base.DataService = value; }
 		}
 
-		public RefreshToken Get(string projectionName, Int32 idToken)
+		public Client Get(string projectionName, Int32 clientId)
 		{
-			return ((IRepository<RefreshToken>)this).Get(projectionName, idToken, FetchMode.UseIdentityMap);
+			return ((IRepository<Client>)this).Get(projectionName, clientId, FetchMode.UseIdentityMap);
 		}
 
-		public RefreshToken Get(string projectionName, Int32 idToken, FetchMode fetchMode = FetchMode.UseIdentityMap)
+		public Client Get(string projectionName, Int32 clientId, FetchMode fetchMode = FetchMode.UseIdentityMap)
 		{
-			return ((IRepository<RefreshToken>)this).Get(projectionName, idToken, fetchMode);
+			return ((IRepository<Client>)this).Get(projectionName, clientId, fetchMode);
 		}
 
-		public RefreshToken Get(Projection projection, Int32 idToken)
+		public Client Get(Projection projection, Int32 clientId)
 		{
-			return ((IRepository<RefreshToken>)this).Get(projection, idToken, FetchMode.UseIdentityMap);
+			return ((IRepository<Client>)this).Get(projection, clientId, FetchMode.UseIdentityMap);
 		}
 
-		public RefreshToken Get(Projection projection, Int32 idToken, FetchMode fetchMode = FetchMode.UseIdentityMap)
+		public Client Get(Projection projection, Int32 clientId, FetchMode fetchMode = FetchMode.UseIdentityMap)
 		{
-			return ((IRepository<RefreshToken>)this).Get(projection, idToken, fetchMode);
+			return ((IRepository<Client>)this).Get(projection, clientId, fetchMode);
 		}
 
-		public RefreshToken Get(string projectionName, Int32 idToken, params string[] fields)
+		public Client Get(string projectionName, Int32 clientId, params string[] fields)
 		{
-			return ((IRepository<RefreshToken>)this).Get(projectionName, idToken, fields);
+			return ((IRepository<Client>)this).Get(projectionName, clientId, fields);
 		}
 
-		public RefreshToken Get(Projection projection, Int32 idToken, params string[] fields)
+		public Client Get(Projection projection, Int32 clientId, params string[] fields)
 		{
-			return ((IRepository<RefreshToken>)this).Get(projection, idToken, fields);
+			return ((IRepository<Client>)this).Get(projection, clientId, fields);
 		}
 
-		public bool Delete(Int32 idToken)
+		public bool Delete(Int32 clientId)
 		{
-			var entity = new RefreshToken { IdToken = idToken };
+			var entity = new Client { ClientId = clientId };
 			return this.Delete(entity);
 		}
 
 				// asyncrhonous methods
 
-		public System.Threading.Tasks.Task<RefreshToken> GetAsync(string projectionName, Int32 idToken)
+		public System.Threading.Tasks.Task<Client> GetAsync(string projectionName, Int32 clientId)
 		{
-			return ((IRepository<RefreshToken>)this).GetAsync(projectionName, idToken, FetchMode.UseIdentityMap);
+			return ((IRepository<Client>)this).GetAsync(projectionName, clientId, FetchMode.UseIdentityMap);
 		}
 
-		public System.Threading.Tasks.Task<RefreshToken> GetAsync(string projectionName, Int32 idToken, FetchMode fetchMode = FetchMode.UseIdentityMap)
+		public System.Threading.Tasks.Task<Client> GetAsync(string projectionName, Int32 clientId, FetchMode fetchMode = FetchMode.UseIdentityMap)
 		{
-			return ((IRepository<RefreshToken>)this).GetAsync(projectionName, idToken, fetchMode);
+			return ((IRepository<Client>)this).GetAsync(projectionName, clientId, fetchMode);
 		}
 
-		public System.Threading.Tasks.Task<RefreshToken> GetAsync(Projection projection, Int32 idToken)
+		public System.Threading.Tasks.Task<Client> GetAsync(Projection projection, Int32 clientId)
 		{
-			return ((IRepository<RefreshToken>)this).GetAsync(projection, idToken, FetchMode.UseIdentityMap);
+			return ((IRepository<Client>)this).GetAsync(projection, clientId, FetchMode.UseIdentityMap);
 		}
 
-		public System.Threading.Tasks.Task<RefreshToken> GetAsync(Projection projection, Int32 idToken, FetchMode fetchMode = FetchMode.UseIdentityMap)
+		public System.Threading.Tasks.Task<Client> GetAsync(Projection projection, Int32 clientId, FetchMode fetchMode = FetchMode.UseIdentityMap)
 		{
-			return ((IRepository<RefreshToken>)this).GetAsync(projection, idToken, fetchMode);
+			return ((IRepository<Client>)this).GetAsync(projection, clientId, fetchMode);
 		}
 
-		public System.Threading.Tasks.Task<RefreshToken> GetAsync(string projectionName, Int32 idToken, params string[] fields)
+		public System.Threading.Tasks.Task<Client> GetAsync(string projectionName, Int32 clientId, params string[] fields)
 		{
-			return ((IRepository<RefreshToken>)this).GetAsync(projectionName, idToken, fields);
+			return ((IRepository<Client>)this).GetAsync(projectionName, clientId, fields);
 		}
 
-		public System.Threading.Tasks.Task<RefreshToken> GetAsync(Projection projection, Int32 idToken, params string[] fields)
+		public System.Threading.Tasks.Task<Client> GetAsync(Projection projection, Int32 clientId, params string[] fields)
 		{
-			return ((IRepository<RefreshToken>)this).GetAsync(projection, idToken, fields);
+			return ((IRepository<Client>)this).GetAsync(projection, clientId, fields);
 		}
 
-		public System.Threading.Tasks.Task<bool> DeleteAsync(Int32 idToken)
+		public System.Threading.Tasks.Task<bool> DeleteAsync(Int32 clientId)
 		{
-			var entity = new RefreshToken { IdToken = idToken };
+			var entity = new Client { ClientId = clientId };
 			return this.DeleteAsync(entity);
 		}
-			}
+		
+		public void DeleteClientAndUserClient(Int32? clientId)
+		{
+            var executor = new StoredProcedureExecutor(this.DataService, true)
+            {
+                GetCommandFunc = () =>
+                {
+                    var proc =  Proyecto_Facturas.Data.StoredProcedures.CreateDeleteClientAndUserClientProcedure(this.DataService.Connection, this.DataService.EntityLiteProvider.ParameterPrefix, this.DataService.EntityLiteProvider.DefaultSchema);
+					proc.Parameters[this.DataService.EntityLiteProvider.ParameterPrefix + "client_id"].Value = clientId == null ? (object) DBNull.Value : clientId.Value;
+                    return proc;
+                }
+            };
+
+			executor.ExecuteNonQuery();
+		}
+
+		public async System.Threading.Tasks.Task DeleteClientAndUserClientAsync(Int32? clientId)
+		{
+            var executor = new StoredProcedureExecutor(this.DataService, true)
+            {
+                GetCommandFunc = () =>
+                {
+                    var proc =  Proyecto_Facturas.Data.StoredProcedures.CreateDeleteClientAndUserClientProcedure(this.DataService.Connection, this.DataService.EntityLiteProvider.ParameterPrefix, this.DataService.EntityLiteProvider.DefaultSchema);
+					proc.Parameters[this.DataService.EntityLiteProvider.ParameterPrefix + "client_id"].Value = clientId == null ? (object) DBNull.Value : clientId.Value;
+                    return proc;
+                }
+            };
+
+			await executor.ExecuteNonQueryAsync().ConfigureAwait(false);
+		}
+	}
 	// [Obsolete("Use nameof instead")]
-	public static partial class RefreshTokenFields
+	public static partial class ClientFields
 	{
-		public const string IdToken = "IdToken";
-		public const string Token = "Token";
-		public const string UserId = "UserId";
-		public const string ExpireAt = "ExpireAt";
-		public const string Revoked = "Revoked";
+		public const string ClientId = "ClientId";
+		public const string CommercialName = "CommercialName";
+		public const string LegalName = "LegalName";
+		public const string Cif = "Cif";
+		public const string Email = "Email";
+		public const string Phone = "Phone";
+		public const string Address = "Address";
+		public const string CreationDate = "CreationDate";
 	}
 
-	public static partial class RefreshTokenProjections
+	public static partial class ClientProjections
+	{
+		public const string BaseTable = "BaseTable";
+	}
+	[Serializable]
+	[DataContract]
+	[SqlEntity(BaseTableName="User_Clients")]
+	public partial class UserClients
+	{
+		private Int32 _userId;
+		[DataMember]
+		[SqlField(DbType.Int32, 4, Precision = 10, IsKey=true, ColumnName ="user_id", BaseColumnName ="user_id", BaseTableName = "User_Clients" )]		
+		public Int32 UserId 
+		{ 
+		    get { return _userId; } 
+			set 
+			{
+			    _userId = value;
+			}
+        }
+
+		private Int32 _clientId;
+		[DataMember]
+		[SqlField(DbType.Int32, 4, Precision = 10, IsKey=true, ColumnName ="client_id", BaseColumnName ="client_id", BaseTableName = "User_Clients" )]		
+		public Int32 ClientId 
+		{ 
+		    get { return _clientId; } 
+			set 
+			{
+			    _clientId = value;
+			}
+        }
+
+		private DateTime _assignmentDate;
+		[DataMember]
+		[SqlField(DbType.DateTime, 8, Precision = 23, Scale=3, ColumnName ="assignment_date", BaseColumnName ="assignment_date", BaseTableName = "User_Clients" )]		
+		public DateTime AssignmentDate 
+		{ 
+		    get { return _assignmentDate; } 
+			set 
+			{
+			    _assignmentDate = value;
+			}
+        }
+
+
+	}
+
+	public partial class UserClientsRepository : Repository<UserClients> 
+	{
+		public UserClientsRepository(DataService DataService) : base(DataService)
+		{
+		}
+
+		public new FacturacionDataService  DataService  
+		{
+			get { return (FacturacionDataService) base.DataService; }
+			set { base.DataService = value; }
+		}
+
+	}
+	// [Obsolete("Use nameof instead")]
+	public static partial class UserClientsFields
+	{
+		public const string UserId = "UserId";
+		public const string ClientId = "ClientId";
+		public const string AssignmentDate = "AssignmentDate";
+	}
+
+	public static partial class UserClientsProjections
 	{
 		public const string BaseTable = "BaseTable";
 	}
@@ -1635,16 +1842,16 @@ namespace Proyecto_Facturas.Data
 			}
 		}
 
-		private Proyecto_Facturas.Data.Master_dataRepository _Master_dataRepository;
-		public Proyecto_Facturas.Data.Master_dataRepository Master_dataRepository
+		private Proyecto_Facturas.Data.InvoiceStatusRepository _InvoiceStatusRepository;
+		public Proyecto_Facturas.Data.InvoiceStatusRepository InvoiceStatusRepository
 		{
 			get 
 			{
-				if ( _Master_dataRepository == null)
+				if ( _InvoiceStatusRepository == null)
 				{
-					_Master_dataRepository = new Proyecto_Facturas.Data.Master_dataRepository(this);
+					_InvoiceStatusRepository = new Proyecto_Facturas.Data.InvoiceStatusRepository(this);
 				}
-				return _Master_dataRepository;
+				return _InvoiceStatusRepository;
 			}
 		}
 
@@ -1674,16 +1881,29 @@ namespace Proyecto_Facturas.Data
 			}
 		}
 
-		private Proyecto_Facturas.Data.RefreshTokenRepository _RefreshTokenRepository;
-		public Proyecto_Facturas.Data.RefreshTokenRepository RefreshTokenRepository
+		private Proyecto_Facturas.Data.ClientRepository _ClientRepository;
+		public Proyecto_Facturas.Data.ClientRepository ClientRepository
 		{
 			get 
 			{
-				if ( _RefreshTokenRepository == null)
+				if ( _ClientRepository == null)
 				{
-					_RefreshTokenRepository = new Proyecto_Facturas.Data.RefreshTokenRepository(this);
+					_ClientRepository = new Proyecto_Facturas.Data.ClientRepository(this);
 				}
-				return _RefreshTokenRepository;
+				return _ClientRepository;
+			}
+		}
+
+		private Proyecto_Facturas.Data.UserClientsRepository _UserClientsRepository;
+		public Proyecto_Facturas.Data.UserClientsRepository UserClientsRepository
+		{
+			get 
+			{
+				if ( _UserClientsRepository == null)
+				{
+					_UserClientsRepository = new Proyecto_Facturas.Data.UserClientsRepository(this);
+				}
+				return _UserClientsRepository;
 			}
 		}
 	}
@@ -1711,6 +1931,54 @@ namespace Proyecto_Facturas.Data
 			p.DbType = DbType.Int32;
             p.Direction = ParameterDirection.Input;
 			p.SourceColumn = "id_factura";
+			cmd.Parameters.Add(p);
+
+			return cmd;
+		}
+
+		public static DbCommand CreateDeleteUserWithInvoicesProcedure(DbConnection connection, string parameterPrefix, string schema = "")
+		{
+			var cmd = connection.CreateCommand();
+			cmd.CommandText = string.IsNullOrEmpty(schema) ? "DeleteUserWithInvoices" : schema + "." + "DeleteUserWithInvoices";
+			cmd.CommandType = CommandType.StoredProcedure;
+			IDbDataParameter p = null;
+
+			p = cmd.CreateParameter();
+			p.ParameterName = parameterPrefix + "RETURN_VALUE";
+			p.DbType = DbType.Int32;
+            p.Direction = ParameterDirection.ReturnValue;
+			p.SourceColumn = "RETURN_VALUE";
+			cmd.Parameters.Add(p);
+
+			p = cmd.CreateParameter();
+			p.ParameterName = parameterPrefix + "user_id";
+			p.DbType = DbType.Int32;
+            p.Direction = ParameterDirection.Input;
+			p.SourceColumn = "user_id";
+			cmd.Parameters.Add(p);
+
+			return cmd;
+		}
+
+		public static DbCommand CreateDeleteClientAndUserClientProcedure(DbConnection connection, string parameterPrefix, string schema = "")
+		{
+			var cmd = connection.CreateCommand();
+			cmd.CommandText = string.IsNullOrEmpty(schema) ? "DeleteClientAndUserClient" : schema + "." + "DeleteClientAndUserClient";
+			cmd.CommandType = CommandType.StoredProcedure;
+			IDbDataParameter p = null;
+
+			p = cmd.CreateParameter();
+			p.ParameterName = parameterPrefix + "RETURN_VALUE";
+			p.DbType = DbType.Int32;
+            p.Direction = ParameterDirection.ReturnValue;
+			p.SourceColumn = "RETURN_VALUE";
+			cmd.Parameters.Add(p);
+
+			p = cmd.CreateParameter();
+			p.ParameterName = parameterPrefix + "client_id";
+			p.DbType = DbType.Int32;
+            p.Direction = ParameterDirection.Input;
+			p.SourceColumn = "client_id";
 			cmd.Parameters.Add(p);
 
 			return cmd;

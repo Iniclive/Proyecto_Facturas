@@ -136,7 +136,7 @@ namespace FacturacionAPI.Controllers
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
-        private async Task<RefreshToken> GenerateRefreshTokenAsync(int idUser)
+        /*private async Task<RefreshToken> GenerateRefreshTokenAsync(int idUser)
         {
             var refreshToken = new RefreshToken
             {
@@ -148,9 +148,9 @@ namespace FacturacionAPI.Controllers
             await _dataService.RefreshTokenRepository.SaveAsync(refreshToken);
 
             return refreshToken;
-        }
+        }*/
 
-        [HttpPost("refresh")]
+       /* [HttpPost("refresh")]
     public async Task<IActionResult> Refresh([FromBody] RefreshRequestDto requestToken)
     {
     try
@@ -205,7 +205,7 @@ namespace FacturacionAPI.Controllers
             }
 
             return refreshToken;
-        }
+        }*/
 
         [Authorize]
         [HttpGet("me")]
