@@ -6,12 +6,13 @@ using FacturacionAPI.DTOs.Lineas;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using System.Linq.Expressions;
+using FacturacionAPI.Extensions;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace FacturacionAPI.Controllers
 {
-    
+
     [Route("api/[controller]")]
     [ApiController]
     public class FacturasController : ControllerBase
@@ -30,9 +31,9 @@ namespace FacturacionAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Factura>>> GetFacturas()
         {
-            
+
             int userId = User.GetUserId();
-            
+
             var query = _dataService.FacturaRepository.Query(FacturaProjections.Basic);
 
             if (!User.IsInRole("admin")) //Como esta asignado desde el builder podemos usar IsInRole
@@ -40,7 +41,8 @@ namespace FacturacionAPI.Controllers
                 query.Where(FacturaFields.CreadoPor, userId);
             }
 
-            var facturas = await query.ToListAsync();
+            var facturas = await query.OrderBy(FacturaFields.Status)
+                .ToListAsync();
             return Ok(facturas);
         }
 
@@ -60,19 +62,19 @@ namespace FacturacionAPI.Controllers
                 {
                     return Forbid();
                 }
-                return Ok(factura); 
+                return Ok(factura);
             }
-                catch (UnauthorizedAccessException ex)
+            catch (UnauthorizedAccessException ex)
             {
                 return Unauthorized("No se pudo identificar al usuario.");
             }
         }
-        
+
 
         // POST api/<FacturasController>
         [Authorize]
         [HttpPost]
-        public ActionResult<Factura> SaveNewFactura([FromBody] Factura nuevaFactura)
+        public async Task<ActionResult<Factura>> SaveNewFactura([FromBody] Factura nuevaFactura)
         {
             try
             {
@@ -82,11 +84,24 @@ namespace FacturacionAPI.Controllers
                 }
                 int userId = User.GetUserId();
 
+                bool clientUserIdExists = await _dataService.UserClientsRepository
+                    .Query(UserClientsProjections.BaseTable)
+                    .Where(UserClientsFields.ClientId, nuevaFactura.ClientId)
+                    .And(UserClientsFields.UserId, userId)
+                    .AnyAsync();
+
+                if (!clientUserIdExists && !User.IsInRole("admin"))
+                {
+                    return StatusCode(403, $"El usuario no tiene acceso a este cliente");
+                }
+
                 nuevaFactura.Creado = DateTime.UtcNow;
                 nuevaFactura.Modificado = DateTime.UtcNow;
 
                 nuevaFactura.CreadoPor = userId;
                 nuevaFactura.ModificadoPor = userId;
+                nuevaFactura.Status = InvoiceStatusExtension.statusToId(Enums.InvoiceStatusEn.EnCreacion);
+
                 _dataService.FacturaRepository.Save(nuevaFactura);
 
                 return Ok(nuevaFactura);
@@ -103,7 +118,7 @@ namespace FacturacionAPI.Controllers
         // PUT api/<FacturasController>/5
         [Authorize]
         [HttpPut]
-        public async Task <ActionResult<Factura>> UpdateFactura([FromBody] Factura facturaActualizada)
+        public async Task<ActionResult<Factura>> UpdateFactura([FromBody] Factura facturaActualizada)
         {
             try
             {
@@ -157,7 +172,108 @@ namespace FacturacionAPI.Controllers
             }
         }
 
-       /* [HttpPut("{id}/lineas")]
+        [Authorize]
+        [HttpPut("{id}/sendToValidate")]
+        public async Task<ActionResult<Factura>> UpdateFacturaStatusToPendingAproval(int id)
+        {
+            try
+            {
+                if (id == 0)
+                {
+                    return BadRequest("Los datos de la factura son nulos.");
+                }
+                var previousInvoice = await _dataService.FacturaRepository
+                    .GetAsync(FacturaProjections.Basic, id);
+
+                int userId = User.GetUserId();
+                if (!verifyUserClient(userId, previousInvoice.ClientId) && !User.IsInRole("admin"))
+                {
+                    return StatusCode(403, $"El usuario no tiene acceso a este cliente");
+                }                
+                previousInvoice.Status = InvoiceStatusExtension.statusToId(Enums.InvoiceStatusEn.PdteAprobacion);
+                await _dataService.FacturaRepository.SaveAsync(previousInvoice);            
+                return Ok(previousInvoice);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al guardar la factura: {ex.Message}");
+            }
+        }
+
+        [Authorize]
+        [HttpPut("{id}/sendToCancelValidate")]
+        public async Task<ActionResult<Factura>> UpdateFacturaStatusToOnCreateFromPending(int id)
+        {
+            try
+            {
+                if (id == 0)
+                {
+                    return BadRequest("Los datos de la factura son nulos.");
+                }
+                var previousInvoice = await _dataService.FacturaRepository
+                    .GetAsync(FacturaProjections.Basic, id);
+
+                int userId = User.GetUserId();
+                if (!verifyUserClient(userId, previousInvoice.ClientId) && !User.IsInRole("admin"))
+                {
+                    return StatusCode(403, $"El usuario no tiene acceso a este cliente");
+                }
+                if (previousInvoice.Status != InvoiceStatusExtension.statusToId(Enums.InvoiceStatusEn.PdteAprobacion)) {
+                    return StatusCode(400, $"La factura no tenia el estado previo correcto");
+                }
+
+                previousInvoice.Status = InvoiceStatusExtension.statusToId(Enums.InvoiceStatusEn.EnCreacion);
+                await _dataService.FacturaRepository.SaveAsync(previousInvoice);
+                return Ok(previousInvoice);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al guardar la factura: {ex.Message}");
+            }
+        }
+        [Authorize]
+        [HttpPut("{id}/sendToApprove")]
+        public async Task<ActionResult<Factura>> UpdateFacturaStatusToApproved(int id)
+        {
+            try
+            {
+                if (id == 0)
+                {
+                    return BadRequest("Los datos de la factura son nulos.");
+                }
+                var previousInvoice = await _dataService.FacturaRepository
+                    .GetAsync(FacturaProjections.Basic, id);
+
+                int userId = User.GetUserId();
+                if (!verifyUserClient(userId, previousInvoice.ClientId) && !User.IsInRole("admin"))
+                {
+                    return StatusCode(403, $"El usuario no tiene acceso a este cliente");
+                }
+                if (previousInvoice.Status != InvoiceStatusExtension.statusToId(Enums.InvoiceStatusEn.PdteAprobacion))
+                {
+                    return StatusCode(400, $"La factura no tenia el estado previo correcto");
+                }
+                previousInvoice.Status = InvoiceStatusExtension.statusToId(Enums.InvoiceStatusEn.AprobadaCerrada);
+                await _dataService.FacturaRepository.SaveAsync(previousInvoice);
+                return Ok(previousInvoice);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al guardar la factura: {ex.Message}");
+            }
+        }
+        private bool verifyUserClient(int userId, int clientId) {
+            return _dataService.UserClientsRepository
+                     .Query(UserClientsProjections.BaseTable)
+                     .Where(UserClientsFields.ClientId, clientId)
+                     .And(UserClientsFields.UserId, userId)
+                     .Any();
+        }
+    
+
+    }
+}
+/* [HttpPut("{id}/lineas")]
         public async Task<IActionResult> UpdateWholeFacturaAsync(int id, [FromBody] FacturaLineasUpdateDto facturaConLineas)
         {
             if (id != facturaConLineas.IdFactura) return BadRequest("El ID de la ruta no coincide con el de la factura.");
@@ -197,7 +313,7 @@ namespace FacturacionAPI.Controllers
                 // 4. Mapear los DTOs preservando/asignando la auditoría
                 var lineasActualesDict = lineasActuales.ToDictionary(l => l.IdLineaFactura);
                 var lineasNuevasMapeadas = new List<LineaFactura>();
-                
+
                 foreach (var dto in facturaConLineas.Lineas)
                 {
                     var idLinea = dto.IdLineaFactura ?? 0;
@@ -261,6 +377,3 @@ namespace FacturacionAPI.Controllers
         }
 
         */
-
-    }
-}

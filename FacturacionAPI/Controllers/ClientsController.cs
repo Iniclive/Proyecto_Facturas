@@ -33,7 +33,7 @@ namespace FacturacionAPI.Controllers
                     query.Where(ClientFields.ClientId, OperatorLite.In, //El uso de OperatorLite permite encadenar subquerys
                         _dataService.UserClientsRepository.Query(UserClientsProjections.BaseTable)
                         .Where(UserClientsFields.UserId, userId)
-                        .Fields(FieldsOption.None, "ClientId"));//Esto fuerza a solo recuperar el ClientId, recomendado para este caso
+                        .Fields(FieldsOption.None, "ClientId"));//Esto fuerza a solo recuperar el ClientId
                 }
 
                 var clients = await query.ToListAsync();
@@ -114,7 +114,7 @@ namespace FacturacionAPI.Controllers
                 bool clientUserIdExists = await _dataService.UserClientsRepository
                     .Query(UserClientsProjections.BaseTable)
                     .Where(UserClientsFields.ClientId, updatedClient.ClientId)
-                    .Where(UserClientsFields.UserId, userId)
+                    .And(UserClientsFields.UserId, userId)
                     .AnyAsync();
     
                 if (!clientUserIdExists && !User.IsInRole("admin")) {
@@ -149,7 +149,7 @@ namespace FacturacionAPI.Controllers
             bool clientUserIdExists = await _dataService.UserClientsRepository
                     .Query(UserClientsProjections.BaseTable)
                     .Where(UserClientsFields.ClientId, id)
-                    .Where(UserClientsFields.UserId, userId)
+                    .And(UserClientsFields.UserId, userId)
                     .AnyAsync();
 
             if (!clientUserIdExists && !User.IsInRole("admin"))

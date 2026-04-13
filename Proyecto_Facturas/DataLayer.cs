@@ -236,15 +236,15 @@ namespace Proyecto_Facturas.Data
 			}
         }
 
-		private String? _clientCommercialName;
+		private String? _clientLegalName;
 		[DataMember]
-		[SqlField(DbType.String, 150, ColumnName ="client_commercial_name" )]		
-		public String? ClientCommercialName 
+		[SqlField(DbType.String, 150, ColumnName ="client_legal_name" )]		
+		public String? ClientLegalName 
 		{ 
-		    get { return _clientCommercialName; } 
+		    get { return _clientLegalName; } 
 			set 
 			{
-			    _clientCommercialName = value;
+			    _clientLegalName = value;
 			}
         }
 
@@ -388,7 +388,7 @@ namespace Proyecto_Facturas.Data
 		public const string StatusName = "StatusName";
 		public const string UserName = "UserName";
 		public const string ClientCif = "ClientCif";
-		public const string ClientCommercialName = "ClientCommercialName";
+		public const string ClientLegalName = "ClientLegalName";
 	}
 
 	public static partial class FacturaProjections
@@ -1106,7 +1106,7 @@ namespace Proyecto_Facturas.Data
 	{
 		private Int32 _statusId;
 		[DataMember]
-		[SqlField(DbType.Int32, 4, Precision = 10, IsKey=true, IsAutoincrement=true, IsReadOnly = true, ColumnName ="status_id", BaseColumnName ="status_id", BaseTableName = "Invoice_Status" )]		
+		[SqlField(DbType.Int32, 4, Precision = 10, IsKey=true, ColumnName ="status_id", BaseColumnName ="status_id", BaseTableName = "Invoice_Status" )]		
 		public Int32 StatusId 
 		{ 
 		    get { return _statusId; } 

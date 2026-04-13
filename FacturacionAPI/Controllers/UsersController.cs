@@ -115,7 +115,7 @@ namespace FacturacionAPI.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Error al eliminar la factura: {ex.Message}");
+                return StatusCode(500, $"Error al eliminar el usuario: {ex.Message}");
             }
         }
 
