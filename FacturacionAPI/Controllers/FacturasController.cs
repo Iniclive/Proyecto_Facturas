@@ -128,6 +128,12 @@ namespace FacturacionAPI.Controllers
                 }
                 var facturaAntigua = await _dataService.FacturaRepository
                 .GetAsync(FacturaProjections.BaseTable, facturaActualizada.IdFactura);
+
+                if (facturaAntigua == null)
+                {
+                    return BadRequest("Los datos de la factura son nulos.");
+                }
+
                 int userId = User.GetUserId();
                 var fechaActual = DateTime.UtcNow;
                 facturaAntigua.Modificado = fechaActual;
@@ -184,6 +190,10 @@ namespace FacturacionAPI.Controllers
                 }
                 var previousInvoice = await _dataService.FacturaRepository
                     .GetAsync(FacturaProjections.Basic, id);
+                if (previousInvoice == null)
+                {
+                    return BadRequest("Los datos de la factura son nulos.");
+                }
 
                 int userId = User.GetUserId();
                 if (!verifyUserClient(userId, previousInvoice.ClientId) && !User.IsInRole("admin"))
@@ -210,8 +220,15 @@ namespace FacturacionAPI.Controllers
                 {
                     return BadRequest("Los datos de la factura son nulos.");
                 }
+
                 var previousInvoice = await _dataService.FacturaRepository
                     .GetAsync(FacturaProjections.Basic, id);
+
+
+                if (previousInvoice == null)
+                {
+                    return BadRequest("Los datos de la factura son nulos.");
+                }
 
                 int userId = User.GetUserId();
                 if (!verifyUserClient(userId, previousInvoice.ClientId) && !User.IsInRole("admin"))
@@ -251,7 +268,7 @@ namespace FacturacionAPI.Controllers
                 }
                 if (previousInvoice.Status != InvoiceStatusExtension.statusToId(Enums.InvoiceStatusEn.PdteAprobacion))
                 {
-                    return StatusCode(400, $"La factura no tenia el estado previo correcto");
+                    return StatusCode(403, $"La factura no tenia el estado previo correcto");
                 }
                 previousInvoice.Status = InvoiceStatusExtension.statusToId(Enums.InvoiceStatusEn.AprobadaCerrada);
                 await _dataService.FacturaRepository.SaveAsync(previousInvoice);

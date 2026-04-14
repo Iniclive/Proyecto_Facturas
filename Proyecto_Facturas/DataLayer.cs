@@ -650,15 +650,15 @@ namespace Proyecto_Facturas.Data
 			}
         }
 
-		private String? _nombreMaterial;
+		private String? _name;
 		[DataMember]
-		[SqlField(DbType.String, 50, ColumnName ="nombre_material" )]		
-		public String? NombreMaterial 
+		[SqlField(DbType.String, 150, ColumnName ="name" )]		
+		public String? Name 
 		{ 
-		    get { return _nombreMaterial; } 
+		    get { return _name; } 
 			set 
 			{
-			    _nombreMaterial = value;
+			    _name = value;
 			}
         }
 
@@ -764,7 +764,7 @@ namespace Proyecto_Facturas.Data
 		public const string Modificado = "Modificado";
 		public const string ModificadoPor = "ModificadoPor";
 		public const string IdFactura = "IdFactura";
-		public const string NombreMaterial = "NombreMaterial";
+		public const string Name = "Name";
 	}
 
 	public static partial class LineaFacturaProjections
@@ -989,13 +989,49 @@ namespace Proyecto_Facturas.Data
 
 		private String? _name;
 		[DataMember]
-		[SqlField(DbType.String, 50, ColumnName ="name", BaseColumnName ="name", BaseTableName = "Materials" )]		
+		[SqlField(DbType.String, 150, ColumnName ="name", BaseColumnName ="name", BaseTableName = "Materials" )]		
 		public String? Name 
 		{ 
 		    get { return _name; } 
 			set 
 			{
 			    _name = value;
+			}
+        }
+
+		private Decimal? _defaultPrice;
+		[DataMember]
+		[SqlField(DbType.Decimal, 17, Precision = 19, Scale=2, AllowNull = true, ColumnName ="default_price", BaseColumnName ="default_price", BaseTableName = "Materials" )]		
+		public Decimal? DefaultPrice 
+		{ 
+		    get { return _defaultPrice; } 
+			set 
+			{
+			    _defaultPrice = value;
+			}
+        }
+
+		private Boolean _active;
+		[DataMember]
+		[SqlField(DbType.Boolean, 1, ColumnName ="active", BaseColumnName ="active", BaseTableName = "Materials" )]		
+		public Boolean Active 
+		{ 
+		    get { return _active; } 
+			set 
+			{
+			    _active = value;
+			}
+        }
+
+		private Int32 _userId;
+		[DataMember]
+		[SqlField(DbType.Int32, 4, Precision = 10, ColumnName ="user_id", BaseColumnName ="user_id", BaseTableName = "Materials" )]		
+		public Int32 UserId 
+		{ 
+		    get { return _userId; } 
+			set 
+			{
+			    _userId = value;
 			}
         }
 
@@ -1093,6 +1129,9 @@ namespace Proyecto_Facturas.Data
 	{
 		public const string IdMaterial = "IdMaterial";
 		public const string Name = "Name";
+		public const string DefaultPrice = "DefaultPrice";
+		public const string Active = "Active";
+		public const string UserId = "UserId";
 	}
 
 	public static partial class MaterialProjections
@@ -1391,7 +1430,7 @@ namespace Proyecto_Facturas.Data
 
 		private String? _nombreMaterial;
 		[DataMember]
-		[SqlField(DbType.String, 50, ColumnName ="nombre_material" )]		
+		[SqlField(DbType.String, 150, ColumnName ="nombre_material" )]		
 		public String? NombreMaterial 
 		{ 
 		    get { return _nombreMaterial; } 
