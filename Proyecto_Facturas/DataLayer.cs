@@ -542,15 +542,15 @@ namespace Proyecto_Facturas.Data
 			}
         }
 
-		private Int32 _idMaterial;
+		private Int32 _productId;
 		[DataMember]
-		[SqlField(DbType.Int32, 4, Precision = 10, ColumnName ="id_material", BaseColumnName ="id_material", BaseTableName = "Lineas_Factura" )]		
-		public Int32 IdMaterial 
+		[SqlField(DbType.Int32, 4, Precision = 10, ColumnName ="product_id", BaseColumnName ="product_id", BaseTableName = "Lineas_Factura" )]		
+		public Int32 ProductId 
 		{ 
-		    get { return _idMaterial; } 
+		    get { return _productId; } 
 			set 
 			{
-			    _idMaterial = value;
+			    _productId = value;
 			}
         }
 
@@ -650,15 +650,15 @@ namespace Proyecto_Facturas.Data
 			}
         }
 
-		private String? _name;
+		private String? _productName;
 		[DataMember]
-		[SqlField(DbType.String, 150, ColumnName ="name" )]		
-		public String? Name 
+		[SqlField(DbType.String, 150, ColumnName ="product_name" )]		
+		public String? ProductName 
 		{ 
-		    get { return _name; } 
+		    get { return _productName; } 
 			set 
 			{
-			    _name = value;
+			    _productName = value;
 			}
         }
 
@@ -755,7 +755,7 @@ namespace Proyecto_Facturas.Data
 	public static partial class LineaFacturaFields
 	{
 		public const string IdLineaFactura = "IdLineaFactura";
-		public const string IdMaterial = "IdMaterial";
+		public const string ProductId = "ProductId";
 		public const string Importe = "Importe";
 		public const string Cantidad = "Cantidad";
 		public const string ImporteTotal = "ImporteTotal";
@@ -764,7 +764,7 @@ namespace Proyecto_Facturas.Data
 		public const string Modificado = "Modificado";
 		public const string ModificadoPor = "ModificadoPor";
 		public const string IdFactura = "IdFactura";
-		public const string Name = "Name";
+		public const string ProductName = "ProductName";
 	}
 
 	public static partial class LineaFacturaProjections
@@ -972,24 +972,24 @@ namespace Proyecto_Facturas.Data
 	}
 	[Serializable]
 	[DataContract]
-	[SqlEntity(BaseTableName="Materials")]
-	public partial class Material
+	[SqlEntity(BaseTableName="Products")]
+	public partial class Product
 	{
-		private Int32 _idMaterial;
+		private Int32 _productId;
 		[DataMember]
-		[SqlField(DbType.Int32, 4, Precision = 10, IsKey=true, IsAutoincrement=true, IsReadOnly = true, ColumnName ="id_material", BaseColumnName ="id_material", BaseTableName = "Materials" )]		
-		public Int32 IdMaterial 
+		[SqlField(DbType.Int32, 4, Precision = 10, IsKey=true, IsAutoincrement=true, IsReadOnly = true, ColumnName ="product_id", BaseColumnName ="product_id", BaseTableName = "Products" )]		
+		public Int32 ProductId 
 		{ 
-		    get { return _idMaterial; } 
+		    get { return _productId; } 
 			set 
 			{
-			    _idMaterial = value;
+			    _productId = value;
 			}
         }
 
 		private String? _name;
 		[DataMember]
-		[SqlField(DbType.String, 150, ColumnName ="name", BaseColumnName ="name", BaseTableName = "Materials" )]		
+		[SqlField(DbType.String, 150, ColumnName ="name", BaseColumnName ="name", BaseTableName = "Products" )]		
 		public String? Name 
 		{ 
 		    get { return _name; } 
@@ -1001,7 +1001,7 @@ namespace Proyecto_Facturas.Data
 
 		private Decimal? _defaultPrice;
 		[DataMember]
-		[SqlField(DbType.Decimal, 17, Precision = 19, Scale=2, AllowNull = true, ColumnName ="default_price", BaseColumnName ="default_price", BaseTableName = "Materials" )]		
+		[SqlField(DbType.Decimal, 17, Precision = 19, Scale=2, AllowNull = true, ColumnName ="default_price", BaseColumnName ="default_price", BaseTableName = "Products" )]		
 		public Decimal? DefaultPrice 
 		{ 
 		    get { return _defaultPrice; } 
@@ -1013,7 +1013,7 @@ namespace Proyecto_Facturas.Data
 
 		private Boolean _active;
 		[DataMember]
-		[SqlField(DbType.Boolean, 1, ColumnName ="active", BaseColumnName ="active", BaseTableName = "Materials" )]		
+		[SqlField(DbType.Boolean, 1, ColumnName ="active", BaseColumnName ="active", BaseTableName = "Products" )]		
 		public Boolean Active 
 		{ 
 		    get { return _active; } 
@@ -1025,7 +1025,7 @@ namespace Proyecto_Facturas.Data
 
 		private Int32 _userId;
 		[DataMember]
-		[SqlField(DbType.Int32, 4, Precision = 10, ColumnName ="user_id", BaseColumnName ="user_id", BaseTableName = "Materials" )]		
+		[SqlField(DbType.Int32, 4, Precision = 10, ColumnName ="user_id", BaseColumnName ="user_id", BaseTableName = "Products" )]		
 		public Int32 UserId 
 		{ 
 		    get { return _userId; } 
@@ -1035,12 +1035,24 @@ namespace Proyecto_Facturas.Data
 			}
         }
 
+		private String? _description;
+		[DataMember]
+		[SqlField(DbType.String, 150, ColumnName ="description", BaseColumnName ="description", BaseTableName = "Products" )]		
+		public String? Description 
+		{ 
+		    get { return _description; } 
+			set 
+			{
+			    _description = value;
+			}
+        }
+
 
 	}
 
-	public partial class MaterialRepository : Repository<Material> 
+	public partial class ProductRepository : Repository<Product> 
 	{
-		public MaterialRepository(DataService DataService) : base(DataService)
+		public ProductRepository(DataService DataService) : base(DataService)
 		{
 		}
 
@@ -1050,91 +1062,92 @@ namespace Proyecto_Facturas.Data
 			set { base.DataService = value; }
 		}
 
-		public Material Get(string projectionName, Int32 idMaterial)
+		public Product Get(string projectionName, Int32 productId)
 		{
-			return ((IRepository<Material>)this).Get(projectionName, idMaterial, FetchMode.UseIdentityMap);
+			return ((IRepository<Product>)this).Get(projectionName, productId, FetchMode.UseIdentityMap);
 		}
 
-		public Material Get(string projectionName, Int32 idMaterial, FetchMode fetchMode = FetchMode.UseIdentityMap)
+		public Product Get(string projectionName, Int32 productId, FetchMode fetchMode = FetchMode.UseIdentityMap)
 		{
-			return ((IRepository<Material>)this).Get(projectionName, idMaterial, fetchMode);
+			return ((IRepository<Product>)this).Get(projectionName, productId, fetchMode);
 		}
 
-		public Material Get(Projection projection, Int32 idMaterial)
+		public Product Get(Projection projection, Int32 productId)
 		{
-			return ((IRepository<Material>)this).Get(projection, idMaterial, FetchMode.UseIdentityMap);
+			return ((IRepository<Product>)this).Get(projection, productId, FetchMode.UseIdentityMap);
 		}
 
-		public Material Get(Projection projection, Int32 idMaterial, FetchMode fetchMode = FetchMode.UseIdentityMap)
+		public Product Get(Projection projection, Int32 productId, FetchMode fetchMode = FetchMode.UseIdentityMap)
 		{
-			return ((IRepository<Material>)this).Get(projection, idMaterial, fetchMode);
+			return ((IRepository<Product>)this).Get(projection, productId, fetchMode);
 		}
 
-		public Material Get(string projectionName, Int32 idMaterial, params string[] fields)
+		public Product Get(string projectionName, Int32 productId, params string[] fields)
 		{
-			return ((IRepository<Material>)this).Get(projectionName, idMaterial, fields);
+			return ((IRepository<Product>)this).Get(projectionName, productId, fields);
 		}
 
-		public Material Get(Projection projection, Int32 idMaterial, params string[] fields)
+		public Product Get(Projection projection, Int32 productId, params string[] fields)
 		{
-			return ((IRepository<Material>)this).Get(projection, idMaterial, fields);
+			return ((IRepository<Product>)this).Get(projection, productId, fields);
 		}
 
-		public bool Delete(Int32 idMaterial)
+		public bool Delete(Int32 productId)
 		{
-			var entity = new Material { IdMaterial = idMaterial };
+			var entity = new Product { ProductId = productId };
 			return this.Delete(entity);
 		}
 
 				// asyncrhonous methods
 
-		public System.Threading.Tasks.Task<Material> GetAsync(string projectionName, Int32 idMaterial)
+		public System.Threading.Tasks.Task<Product> GetAsync(string projectionName, Int32 productId)
 		{
-			return ((IRepository<Material>)this).GetAsync(projectionName, idMaterial, FetchMode.UseIdentityMap);
+			return ((IRepository<Product>)this).GetAsync(projectionName, productId, FetchMode.UseIdentityMap);
 		}
 
-		public System.Threading.Tasks.Task<Material> GetAsync(string projectionName, Int32 idMaterial, FetchMode fetchMode = FetchMode.UseIdentityMap)
+		public System.Threading.Tasks.Task<Product> GetAsync(string projectionName, Int32 productId, FetchMode fetchMode = FetchMode.UseIdentityMap)
 		{
-			return ((IRepository<Material>)this).GetAsync(projectionName, idMaterial, fetchMode);
+			return ((IRepository<Product>)this).GetAsync(projectionName, productId, fetchMode);
 		}
 
-		public System.Threading.Tasks.Task<Material> GetAsync(Projection projection, Int32 idMaterial)
+		public System.Threading.Tasks.Task<Product> GetAsync(Projection projection, Int32 productId)
 		{
-			return ((IRepository<Material>)this).GetAsync(projection, idMaterial, FetchMode.UseIdentityMap);
+			return ((IRepository<Product>)this).GetAsync(projection, productId, FetchMode.UseIdentityMap);
 		}
 
-		public System.Threading.Tasks.Task<Material> GetAsync(Projection projection, Int32 idMaterial, FetchMode fetchMode = FetchMode.UseIdentityMap)
+		public System.Threading.Tasks.Task<Product> GetAsync(Projection projection, Int32 productId, FetchMode fetchMode = FetchMode.UseIdentityMap)
 		{
-			return ((IRepository<Material>)this).GetAsync(projection, idMaterial, fetchMode);
+			return ((IRepository<Product>)this).GetAsync(projection, productId, fetchMode);
 		}
 
-		public System.Threading.Tasks.Task<Material> GetAsync(string projectionName, Int32 idMaterial, params string[] fields)
+		public System.Threading.Tasks.Task<Product> GetAsync(string projectionName, Int32 productId, params string[] fields)
 		{
-			return ((IRepository<Material>)this).GetAsync(projectionName, idMaterial, fields);
+			return ((IRepository<Product>)this).GetAsync(projectionName, productId, fields);
 		}
 
-		public System.Threading.Tasks.Task<Material> GetAsync(Projection projection, Int32 idMaterial, params string[] fields)
+		public System.Threading.Tasks.Task<Product> GetAsync(Projection projection, Int32 productId, params string[] fields)
 		{
-			return ((IRepository<Material>)this).GetAsync(projection, idMaterial, fields);
+			return ((IRepository<Product>)this).GetAsync(projection, productId, fields);
 		}
 
-		public System.Threading.Tasks.Task<bool> DeleteAsync(Int32 idMaterial)
+		public System.Threading.Tasks.Task<bool> DeleteAsync(Int32 productId)
 		{
-			var entity = new Material { IdMaterial = idMaterial };
+			var entity = new Product { ProductId = productId };
 			return this.DeleteAsync(entity);
 		}
 			}
 	// [Obsolete("Use nameof instead")]
-	public static partial class MaterialFields
+	public static partial class ProductFields
 	{
-		public const string IdMaterial = "IdMaterial";
+		public const string ProductId = "ProductId";
 		public const string Name = "Name";
 		public const string DefaultPrice = "DefaultPrice";
 		public const string Active = "Active";
 		public const string UserId = "UserId";
+		public const string Description = "Description";
 	}
 
-	public static partial class MaterialProjections
+	public static partial class ProductProjections
 	{
 		public const string BaseTable = "BaseTable";
 	}
@@ -1372,114 +1385,6 @@ namespace Proyecto_Facturas.Data
 	}
 
 	public static partial class FacturaSimpleProjections
-	{
-		public const string BaseTable = "BaseTable";
-	}
-	[Serializable]
-	[DataContract]
-	[SqlEntity(BaseTableName="LineaSimple")]
-	public partial class LineaSimple
-	{
-		private Int32 _idLineaFactura;
-		[DataMember]
-		[SqlField(DbType.Int32, 4, Precision = 10, IsKey=true, ColumnName ="id_linea_factura" )]		
-		public Int32 IdLineaFactura 
-		{ 
-		    get { return _idLineaFactura; } 
-			set 
-			{
-			    _idLineaFactura = value;
-			}
-        }
-
-		private Int32 _cantidad;
-		[DataMember]
-		[SqlField(DbType.Int32, 4, Precision = 10, ColumnName ="cantidad" )]		
-		public Int32 Cantidad 
-		{ 
-		    get { return _cantidad; } 
-			set 
-			{
-			    _cantidad = value;
-			}
-        }
-
-		private Decimal _importe;
-		[DataMember]
-		[SqlField(DbType.Decimal, 17, Precision = 19, Scale=2, ColumnName ="importe" )]		
-		public Decimal Importe 
-		{ 
-		    get { return _importe; } 
-			set 
-			{
-			    _importe = value;
-			}
-        }
-
-		private Decimal? _importeTotal;
-		[DataMember]
-		[SqlField(DbType.Decimal, 17, Precision = 30, Scale=2, AllowNull = true, IsReadOnly = true, ColumnName ="importe_total" )]		
-		public Decimal? ImporteTotal 
-		{ 
-		    get { return _importeTotal; } 
-			set 
-			{
-			    _importeTotal = value;
-			}
-        }
-
-		private String? _nombreMaterial;
-		[DataMember]
-		[SqlField(DbType.String, 150, ColumnName ="nombre_material" )]		
-		public String? NombreMaterial 
-		{ 
-		    get { return _nombreMaterial; } 
-			set 
-			{
-			    _nombreMaterial = value;
-			}
-        }
-
-		private Int32 _idFactura;
-		[DataMember]
-		[SqlField(DbType.Int32, 4, Precision = 10, ColumnName ="id_factura" )]		
-		public Int32 IdFactura 
-		{ 
-		    get { return _idFactura; } 
-			set 
-			{
-			    _idFactura = value;
-			}
-        }
-
-
-	}
-
-	public partial class LineaSimpleRepository : Repository<LineaSimple> 
-	{
-		public LineaSimpleRepository(DataService DataService) : base(DataService)
-		{
-		}
-
-		public new FacturacionDataService  DataService  
-		{
-			get { return (FacturacionDataService) base.DataService; }
-			set { base.DataService = value; }
-		}
-
-	}
-	// [Obsolete("Use nameof instead")]
-	public static partial class LineaSimpleFields
-	{
-		public const string IdLineaFactura = "IdLineaFactura";
-		public const string Cantidad = "Cantidad";
-		public const string Importe = "Importe";
-		public const string ImporteTotal = "ImporteTotal";
-		public const string NombreMaterial = "NombreMaterial";
-		public const string IdFactura = "IdFactura";
-	}
-
-	public static partial class LineaSimpleProjections
 	{
 		public const string BaseTable = "BaseTable";
 	}
@@ -1868,16 +1773,16 @@ namespace Proyecto_Facturas.Data
 			}
 		}
 
-		private Proyecto_Facturas.Data.MaterialRepository _MaterialRepository;
-		public Proyecto_Facturas.Data.MaterialRepository MaterialRepository
+		private Proyecto_Facturas.Data.ProductRepository _ProductRepository;
+		public Proyecto_Facturas.Data.ProductRepository ProductRepository
 		{
 			get 
 			{
-				if ( _MaterialRepository == null)
+				if ( _ProductRepository == null)
 				{
-					_MaterialRepository = new Proyecto_Facturas.Data.MaterialRepository(this);
+					_ProductRepository = new Proyecto_Facturas.Data.ProductRepository(this);
 				}
-				return _MaterialRepository;
+				return _ProductRepository;
 			}
 		}
 
@@ -1904,19 +1809,6 @@ namespace Proyecto_Facturas.Data
 					_FacturaSimpleRepository = new Proyecto_Facturas.Data.FacturaSimpleRepository(this);
 				}
 				return _FacturaSimpleRepository;
-			}
-		}
-
-		private Proyecto_Facturas.Data.LineaSimpleRepository _LineaSimpleRepository;
-		public Proyecto_Facturas.Data.LineaSimpleRepository LineaSimpleRepository
-		{
-			get 
-			{
-				if ( _LineaSimpleRepository == null)
-				{
-					_LineaSimpleRepository = new Proyecto_Facturas.Data.LineaSimpleRepository(this);
-				}
-				return _LineaSimpleRepository;
 			}
 		}
 

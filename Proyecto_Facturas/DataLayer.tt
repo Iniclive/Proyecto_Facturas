@@ -32,10 +32,9 @@
 			new EntitySetting { EntityName = "Insurance", BaseTableName = "Insurances" },
 			new EntitySetting { EntityName = "LineaFactura", BaseTableName = "Lineas_Factura" },
 			new EntitySetting { EntityName = "User", BaseTableName = "Users" },
-			new EntitySetting { EntityName = "Material", BaseTableName = "Materials" },
+			new EntitySetting { EntityName = "Product", BaseTableName = "Products" },
 			new EntitySetting { EntityName = "InvoiceStatus", BaseTableName = "Invoice_Status" },
 			new EntitySetting { EntityName = "FacturaSimple", BaseTableName = "FacturaSimple"},
-			new EntitySetting { EntityName = "LineaSimple", BaseTableName = "LineaSimple"},
 			new EntitySetting { EntityName = "Client", BaseTableName = "Clients"},
 			new EntitySetting { EntityName = "UserClients", BaseTableName = "User_Clients"}
 			

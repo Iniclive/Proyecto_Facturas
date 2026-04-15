@@ -129,7 +129,7 @@ namespace FacturacionAPI.Controllers
                 previusClient.Email = updatedClient.Email;
                 previusClient.Address = updatedClient.Address;
                 previusClient.Phone = updatedClient.Phone;
-                
+
                 await _dataService.ClientRepository.SaveAsync(previusClient);
 
                 return Ok(previusClient);

@@ -87,7 +87,7 @@ namespace FacturacionAPI.Controllers
                 lineaOriginal.ModificadoPor = userId;
                 lineaOriginal.Cantidad = nuevaLinea.Cantidad;
                 lineaOriginal.Importe = nuevaLinea.Importe;
-                lineaOriginal.IdMaterial = nuevaLinea.IdMaterial;
+                lineaOriginal.ProductId = nuevaLinea.ProductId;
 
                 _dataService.LineaFacturaRepository.Save(lineaOriginal);
                 var facturaResumen = await ActualizarFacturaAsync(lineaOriginal.IdFactura, userId, fechaActual);
