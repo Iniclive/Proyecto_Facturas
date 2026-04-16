@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using System.Linq.Expressions;
 using FacturacionAPI.Extensions;
+using Microsoft.VisualBasic;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -97,7 +98,7 @@ namespace FacturacionAPI.Controllers
 
                 nuevaFactura.Creado = DateTime.UtcNow;
                 nuevaFactura.Modificado = DateTime.UtcNow;
-
+               // nuevaFactura.EntityRowVersion = 1;
                 nuevaFactura.CreadoPor = userId;
                 nuevaFactura.ModificadoPor = userId;
                 nuevaFactura.Status = InvoiceStatusExtension.statusToId(Enums.InvoiceStatusEn.EnCreacion);
@@ -133,7 +134,9 @@ namespace FacturacionAPI.Controllers
                 {
                     return BadRequest("Los datos de la factura son nulos.");
                 }
-
+                if (facturaAntigua.EntityRowVersion != facturaActualizada.EntityRowVersion) { 
+                    return StatusCode(415, $"Error al guardar la factura: Es necesario actualizar la pagina");
+                }
                 int userId = User.GetUserId();
                 var fechaActual = DateTime.UtcNow;
                 facturaAntigua.Modificado = fechaActual;
@@ -158,10 +161,23 @@ namespace FacturacionAPI.Controllers
         // DELETE api/<FacturasController>/5
         [Authorize]
         [HttpDelete("{id}")]
-        public IActionResult DeleteFactura(int id)
+        public async Task<ActionResult>DeleteFactura(int id, [FromHeader(Name = "If-Match")] int entityRowVersion)
         {
             try
             {
+                var previousInvoice = await _dataService.FacturaRepository
+                    .GetAsync(FacturaProjections.BaseTable, id);
+                int userId = User.GetUserId();
+
+                if (!verifyUserClient(userId, previousInvoice.ClientId) && !User.IsInRole("admin"))
+                {
+                    return StatusCode(403, $"El usuario no tiene acceso a este cliente");
+                }
+                if (previousInvoice.EntityRowVersion != entityRowVersion)
+                {
+                    return StatusCode(415, "La factura ha sido modificada.");
+                }
+
                 _dataService.FacturaRepository.EliminarLineasFacturaAsociadas(id);
                 var eliminado = _dataService.FacturaRepository.Delete(id);
 
@@ -180,7 +196,7 @@ namespace FacturacionAPI.Controllers
 
         [Authorize]
         [HttpPut("{id}/sendToValidate")]
-        public async Task<ActionResult<Factura>> UpdateFacturaStatusToPendingAproval(int id)
+        public async Task<ActionResult<Factura>> UpdateFacturaStatusToPendingAproval(int id, [FromHeader(Name = "If-Match")] int entityRowVersion)
         {
             try
             {
@@ -192,15 +208,26 @@ namespace FacturacionAPI.Controllers
                     .GetAsync(FacturaProjections.Basic, id);
                 if (previousInvoice == null)
                 {
-                    return BadRequest("Los datos de la factura son nulos.");
+                    return BadRequest("No se ha encontrado la factura.");
                 }
-
                 int userId = User.GetUserId();
                 if (!verifyUserClient(userId, previousInvoice.ClientId) && !User.IsInRole("admin"))
                 {
                     return StatusCode(403, $"El usuario no tiene acceso a este cliente");
-                }                
+                }
+                if (previousInvoice.EntityRowVersion != entityRowVersion)
+                {
+                    return StatusCode(415, "La factura ha sido modificada.");
+                }
+                /*if (!verifyUserInvoice(userId, previousInvoice.ClientId) && !User.IsInRole("admin")) {
+                    return StatusCode(403, $"El usuario no tiene acceso a esta factura");
+                }*/
+
+                if (previousInvoice.Status != InvoiceStatusExtension.statusToId(Enums.InvoiceStatusEn.EnCreacion)) {
+                    return StatusCode(415, $"El anterior estado de la factura no es correcto, es necesario referescar la pagina");
+                }
                 previousInvoice.Status = InvoiceStatusExtension.statusToId(Enums.InvoiceStatusEn.PdteAprobacion);
+
                 await _dataService.FacturaRepository.SaveAsync(previousInvoice);            
                 return Ok(previousInvoice);
             }
@@ -212,7 +239,7 @@ namespace FacturacionAPI.Controllers
 
         [Authorize]
         [HttpPut("{id}/sendToCancelValidate")]
-        public async Task<ActionResult<Factura>> UpdateFacturaStatusToOnCreateFromPending(int id)
+        public async Task<ActionResult<Factura>> UpdateFacturaStatusToOnCreateFromPending(int id ,[FromHeader(Name = "If-Match")] int entityRowVersion)
         {
             try
             {
@@ -235,12 +262,17 @@ namespace FacturacionAPI.Controllers
                 {
                     return StatusCode(403, $"El usuario no tiene acceso a este cliente");
                 }
+                if (previousInvoice.EntityRowVersion != entityRowVersion)
+                {
+                    return StatusCode(415, "La factura ha sido modificada.");
+                }
                 if (previousInvoice.Status != InvoiceStatusExtension.statusToId(Enums.InvoiceStatusEn.PdteAprobacion)) {
-                    return StatusCode(400, $"La factura no tenia el estado previo correcto");
+                    return StatusCode(415, $"La factura no tenia el estado previo correcto");
                 }
 
                 previousInvoice.Status = InvoiceStatusExtension.statusToId(Enums.InvoiceStatusEn.EnCreacion);
                 await _dataService.FacturaRepository.SaveAsync(previousInvoice);
+               // previousInvoice.EntityRowVersion++;
                 return Ok(previousInvoice);
             }
             catch (Exception ex)
@@ -250,7 +282,7 @@ namespace FacturacionAPI.Controllers
         }
         [Authorize]
         [HttpPut("{id}/sendToApprove")]
-        public async Task<ActionResult<Factura>> UpdateFacturaStatusToApproved(int id)
+        public async Task<ActionResult<Factura>> UpdateFacturaStatusToApproved(int id, [FromHeader(Name = "If-Match")] int entityRowVersion)
         {
             try
             {
@@ -266,11 +298,16 @@ namespace FacturacionAPI.Controllers
                 {
                     return StatusCode(403, $"El usuario no tiene acceso a este cliente");
                 }
+                if (previousInvoice.EntityRowVersion != entityRowVersion)
+                {
+                    return StatusCode(415, "La factura ha sido modificada.");
+                }
                 if (previousInvoice.Status != InvoiceStatusExtension.statusToId(Enums.InvoiceStatusEn.PdteAprobacion))
                 {
-                    return StatusCode(403, $"La factura no tenia el estado previo correcto");
+                    return StatusCode(415, $"La factura no tenia el estado previo correcto");
                 }
                 previousInvoice.Status = InvoiceStatusExtension.statusToId(Enums.InvoiceStatusEn.AprobadaCerrada);
+               // previousInvoice.EntityRowVersion++;
                 await _dataService.FacturaRepository.SaveAsync(previousInvoice);
                 return Ok(previousInvoice);
             }
@@ -286,7 +323,17 @@ namespace FacturacionAPI.Controllers
                      .And(UserClientsFields.UserId, userId)
                      .Any();
         }
-    
+
+        private bool verifyUserInvoice(int userId, int facturaId)
+        {
+            return _dataService.FacturaRepository
+                     .Query(FacturaProjections.BaseTable)
+                     .Where(FacturaFields.IdFactura, facturaId)
+                     .And(FacturaFields.Creado, userId)
+                     .Any();
+        }
+
+
 
     }
 }

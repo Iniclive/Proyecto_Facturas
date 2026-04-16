@@ -188,6 +188,18 @@ namespace Proyecto_Facturas.Data
 			}
         }
 
+		private Int32 _entityRowVersion;
+		[DataMember]
+		[SqlField(DbType.Int32, 4, Precision = 10, ColumnName ="entity_row_version", BaseColumnName ="entity_row_version", BaseTableName = "Facturas" )]		
+		public Int32 EntityRowVersion 
+		{ 
+		    get { return _entityRowVersion; } 
+			set 
+			{
+			    _entityRowVersion = value;
+			}
+        }
+
 		private String? _insuranceName;
 		[DataMember]
 		[SqlField(DbType.String, 50, ColumnName ="insurance_name" )]		
@@ -384,6 +396,7 @@ namespace Proyecto_Facturas.Data
 		public const string Modificado = "Modificado";
 		public const string ModificadoPor = "ModificadoPor";
 		public const string ClientId = "ClientId";
+		public const string EntityRowVersion = "EntityRowVersion";
 		public const string InsuranceName = "InsuranceName";
 		public const string StatusName = "StatusName";
 		public const string UserName = "UserName";

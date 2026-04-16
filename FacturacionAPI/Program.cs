@@ -20,7 +20,8 @@ builder.Services.AddCors(options =>
         policy.WithOrigins("http://localhost:4200") // URL de tu proyecto Angular
               .AllowAnyHeader()
               .AllowAnyMethod()
-              .AllowCredentials();
+              .AllowCredentials()
+              .WithExposedHeaders("If-Match"); ;
     });
 });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
