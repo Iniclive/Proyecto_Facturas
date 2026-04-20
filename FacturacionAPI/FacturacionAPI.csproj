@@ -16,4 +16,9 @@
     <ProjectReference Include="..\Proyecto_Facturas\Proyecto_Facturas.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Application\Insurance\" />
+    <Folder Include="Application\Users\" />
+  </ItemGroup>
+
 </Project>
