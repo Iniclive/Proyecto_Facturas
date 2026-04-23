@@ -1,5 +1,5 @@
-using FacturacionAPI.Api.Middleware;
 using FacturacionAPI.Configuration;
+using FacturacionAPI.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 

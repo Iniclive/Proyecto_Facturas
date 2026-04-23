@@ -1707,6 +1707,88 @@ namespace Proyecto_Facturas.Data
 	{
 		public const string BaseTable = "BaseTable";
 	}
+	[Serializable]
+	[DataContract]
+	[SqlEntity(BaseTableName="Dashboard_Summary")]
+	public partial class DashboardSummary
+	{
+		private Int32 _idUser;
+		[DataMember]
+		[SqlField(DbType.Int32, 4, Precision = 10, IsKey=true, ColumnName ="id_user" )]		
+		public Int32 IdUser 
+		{ 
+		    get { return _idUser; } 
+			set 
+			{
+			    _idUser = value;
+			}
+        }
+
+		private Int32? _totalClients;
+		[DataMember]
+		[SqlField(DbType.Int32, 4, Precision = 10, AllowNull = true, ColumnName ="totalClients" )]		
+		public Int32? TotalClients 
+		{ 
+		    get { return _totalClients; } 
+			set 
+			{
+			    _totalClients = value;
+			}
+        }
+
+		private Decimal _totalFacturado;
+		[DataMember]
+		[SqlField(DbType.Decimal, 17, Precision = 38, Scale=6, IsReadOnly = true, ColumnName ="totalFacturado" )]		
+		public Decimal TotalFacturado 
+		{ 
+		    get { return _totalFacturado; } 
+			set 
+			{
+			    _totalFacturado = value;
+			}
+        }
+
+		private Int32? _totalUsers;
+		[DataMember]
+		[SqlField(DbType.Int32, 4, Precision = 10, AllowNull = true, IsReadOnly = true, ColumnName ="totalUsers" )]		
+		public Int32? TotalUsers 
+		{ 
+		    get { return _totalUsers; } 
+			set 
+			{
+			    _totalUsers = value;
+			}
+        }
+
+
+	}
+
+	public partial class DashboardSummaryRepository : Repository<DashboardSummary> 
+	{
+		public DashboardSummaryRepository(DataService DataService) : base(DataService)
+		{
+		}
+
+		public new FacturacionDataService  DataService  
+		{
+			get { return (FacturacionDataService) base.DataService; }
+			set { base.DataService = value; }
+		}
+
+	}
+	// [Obsolete("Use nameof instead")]
+	public static partial class DashboardSummaryFields
+	{
+		public const string IdUser = "IdUser";
+		public const string TotalClients = "TotalClients";
+		public const string TotalFacturado = "TotalFacturado";
+		public const string TotalUsers = "TotalUsers";
+	}
+
+	public static partial class DashboardSummaryProjections
+	{
+		public const string BaseTable = "BaseTable";
+	}
 }
 
 namespace Proyecto_Facturas.Data
@@ -1848,6 +1930,19 @@ namespace Proyecto_Facturas.Data
 					_UserClientsRepository = new Proyecto_Facturas.Data.UserClientsRepository(this);
 				}
 				return _UserClientsRepository;
+			}
+		}
+
+		private Proyecto_Facturas.Data.DashboardSummaryRepository _DashboardSummaryRepository;
+		public Proyecto_Facturas.Data.DashboardSummaryRepository DashboardSummaryRepository
+		{
+			get 
+			{
+				if ( _DashboardSummaryRepository == null)
+				{
+					_DashboardSummaryRepository = new Proyecto_Facturas.Data.DashboardSummaryRepository(this);
+				}
+				return _DashboardSummaryRepository;
 			}
 		}
 	}

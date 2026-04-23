@@ -36,7 +36,8 @@
 			new EntitySetting { EntityName = "InvoiceStatus", BaseTableName = "Invoice_Status" },
 			new EntitySetting { EntityName = "FacturaSimple", BaseTableName = "FacturaSimple"},
 			new EntitySetting { EntityName = "Client", BaseTableName = "Clients"},
-			new EntitySetting { EntityName = "UserClients", BaseTableName = "User_Clients"}
+			new EntitySetting { EntityName = "UserClients", BaseTableName = "User_Clients"},
+			new EntitySetting { EntityName = "DashboardSummary", BaseTableName = "Dashboard_Summary"}
 			
 		},
 		ProcedureSettings = new List<ProcedureSetting>
