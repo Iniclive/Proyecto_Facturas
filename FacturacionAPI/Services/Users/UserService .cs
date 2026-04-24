@@ -80,7 +80,7 @@ namespace FacturacionAPI.Application.Users
             {
                 var emailExists = await _repository
                     .Query(UserProjections.BaseTable)
-                    .Where(UserFields.Email, previousUser.Email)
+                    .Where(UserFields.Email, updatedUser.Email)
                     .AnyAsync();
 
                 if (emailExists)
@@ -124,22 +124,90 @@ namespace FacturacionAPI.Application.Users
                 return Result.Failure(new Error(
                     Code: "InvalidCredentials",
                     Message: "Credenciales inválidas",
-                    Type: ErrorType.Unauthorized
+                    Type: ErrorType.BadRequest
                 ));
             }
 
-            if (!string.IsNullOrEmpty(request.NewPassword))
+            if (string.IsNullOrEmpty(request.NewPassword))
             {
                 return Result.Failure(new Error(
                     Code: "BadRequest",
                     Message: "Nueva contraseña invalida",
                     Type: ErrorType.BadRequest
                 ));
-
             }
+
             user.Password = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
             await _repository.UpdateAsync(user, UserFields.Password);
 
+            return Result.Success();
+        }
+
+        public async Task<Result> UpdateEmailAsync(UpdateEmailDto request) {
+
+            var user = await _repository.GetAsync(UserProjections.BaseTable, _currentUser.UserId);
+
+            if (user == null)
+            {
+                return Result.Failure(new Error(
+                    Code: "InvalidUserID",
+                    Message: "Usuario no encontrado",
+                    Type: ErrorType.NotFound
+                ));
+            }
+
+            if (string.IsNullOrEmpty(request.Email))
+            {
+                return Result.Failure(new Error(
+                    Code: "InvalidEmailInformation",
+                    Message: "Nuevo email invalida",
+                    Type: ErrorType.BadRequest
+                ));
+            }
+
+            if (user.Email != request.Email)
+            {
+                var emailExists = await _repository
+                    .Query(UserProjections.BaseTable)
+                    .Where(UserFields.Email, request.Email)
+                    .AnyAsync();
+
+                if (emailExists)
+                    return Result.Failure(new Error(
+                    Code: "DuplicatedEmail",
+                    Message: "El email ya esta registrado",
+                    Type: ErrorType.BadRequest
+                ));
+            }
+
+            user.Email = request.Email;
+            await _repository.UpdateAsync(user, UserFields.Email);
+
+            return Result.Success();
+        }
+        public async Task<Result> UpdateNameAsync(UpdateNameDto request) {
+
+            var user = await _repository.GetAsync(UserProjections.BaseTable, _currentUser.UserId);
+
+            if (user == null)
+            {
+                return Result.Failure(new Error(
+                    Code: "InvalidUserID",
+                    Message: "Usuario no encontrado",
+                    Type: ErrorType.NotFound
+                ));
+            }
+
+            if (string.IsNullOrEmpty(request.Name))
+            {
+                return Result.Failure(new Error(
+                    Code: "BadRequest",
+                    Message: "Nuevo nombre de usuario invalido",
+                    Type: ErrorType.BadRequest
+                ));
+            }
+            user.Name = request.Name;
+            await _repository.UpdateAsync(user, UserFields.Name);
             return Result.Success();
         }
     }

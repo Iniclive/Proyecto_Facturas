@@ -12,6 +12,8 @@ namespace FacturacionAPI.Application.Users
         Task<Result<User>> UpdateAsync(User updatedUser);
 
         Task<Result> UpdatePasswordAsync(UpdatePasswordRequestDto request);
+        Task<Result> UpdateEmailAsync(UpdateEmailDto request);
+        Task<Result> UpdateNameAsync(UpdateNameDto request);
         Task<Result> DeleteAsync(int id);
     }
 }

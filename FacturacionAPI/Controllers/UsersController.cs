@@ -42,5 +42,17 @@ namespace FacturacionAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
             => FromResult(await _userService.DeleteAsync(id));
+
+        [Authorize]
+        [HttpPatch("email")]
+        public async Task<IActionResult> UpdateEmail([FromBody] UpdateEmailDto dto)
+        => FromResult(await _userService.UpdateEmailAsync(dto));
+
+        [Authorize]
+        [HttpPatch("name")]
+        public async Task<IActionResult> UpdateName([FromBody] UpdateNameDto dto)
+            => FromResult(await _userService.UpdateNameAsync(dto));
+
+
     }
 }
